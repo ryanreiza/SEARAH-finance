@@ -73,28 +73,28 @@ export const CategoriesPage: React.FC = () => {
       />
 
       {/* Tabs */}
-      <div className="flex p-1 bg-stone-200/60 rounded-2xl w-fit">
+      <div className="flex p-1 bg-stone-200/60 rounded-2xl w-full sm:w-fit">
         <button
           onClick={() => setActiveTab('expense')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer min-h-[40px] ${
             activeTab === 'expense'
               ? 'bg-white text-rose-700 shadow-xs'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <ArrowUpRight className="w-4 h-4" />
-          Kategori Pengeluaran ({categories.filter((c) => c.type === 'expense').length})
+          <ArrowUpRight className="w-4 h-4 shrink-0" />
+          <span>Pengeluaran ({categories.filter((c) => c.type === 'expense').length})</span>
         </button>
         <button
           onClick={() => setActiveTab('income')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer min-h-[40px] ${
             activeTab === 'income'
               ? 'bg-white text-emerald-700 shadow-xs'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <ArrowDownRight className="w-4 h-4" />
-          Kategori Pemasukan ({categories.filter((c) => c.type === 'income').length})
+          <ArrowDownRight className="w-4 h-4 shrink-0" />
+          <span>Pemasukan ({categories.filter((c) => c.type === 'income').length})</span>
         </button>
       </div>
 

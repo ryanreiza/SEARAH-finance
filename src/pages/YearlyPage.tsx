@@ -154,17 +154,17 @@ export const YearlyPage: React.FC = () => {
       </div>
 
       {/* Annual Bar Chart */}
-      <div className="card-bento p-6">
-        <h3 className="font-display font-bold text-sm text-slate-900 mb-4 pb-2 border-b border-stone-200">
+      <div className="card-bento p-4 sm:p-6">
+        <h3 className="font-display font-bold text-sm text-slate-900 mb-3 pb-2 border-b border-stone-200">
           Grafik Arus Kas 12 Bulan (Pemasukan vs Pengeluaran)
         </h3>
 
-        <div className="h-80 w-full">
+        <div className="h-64 sm:h-80 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-              <XAxis dataKey="month" fontSize={11} stroke="#64748b" tickLine={false} />
+            <BarChart data={monthlyData} margin={{ top: 15, right: 10, left: -20, bottom: 5 }}>
+              <XAxis dataKey="month" fontSize={10} stroke="#64748b" tickLine={false} />
               <YAxis
-                fontSize={10}
+                fontSize={9}
                 stroke="#64748b"
                 tickLine={false}
                 tickFormatter={(v) => `${Math.round(v / 1000000)}jt`}
@@ -179,7 +179,7 @@ export const YearlyPage: React.FC = () => {
                   fontSize: '12px',
                 }}
               />
-              <Legend wrapperStyle={{ fontSize: '12px' }} />
+              <Legend wrapperStyle={{ fontSize: '11px' }} />
               <Bar dataKey="Pemasukan" fill="#10b981" radius={[4, 4, 0, 0]} />
               <Bar dataKey="Pengeluaran" fill="#f87171" radius={[4, 4, 0, 0]} />
             </BarChart>
@@ -187,15 +187,49 @@ export const YearlyPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 12-Month Table */}
+      {/* 12-Month Table & Mobile Cards */}
       <div className="card-bento overflow-hidden">
-        <div className="p-4 border-b border-stone-200">
+        <div className="p-4 border-b border-stone-200 flex items-center justify-between">
           <h3 className="font-display font-bold text-sm text-slate-900">
             Tabel Rincian Bulanan Tahun {selectedYear}
           </h3>
+          <span className="text-xs text-slate-400 font-mono">12 Bulan</span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Card List (block on <sm) */}
+        <div className="block sm:hidden divide-y divide-stone-100">
+          {monthlyData.map((m, idx) => (
+            <div key={idx} className="p-3.5 space-y-1.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-xs text-slate-900">{m.fullMonth}</span>
+                <span className="font-mono text-[11px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-slate-800 border border-stone-200">
+                  Tabungan: {m.rate}%
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
+                <div className="p-2 rounded-xl bg-emerald-50/70 border border-emerald-100">
+                  <span className="text-[10px] text-emerald-800 font-medium">Pemasukan:</span>
+                  <p className="font-mono font-bold text-emerald-700 mt-0.5">{formatRupiah(m.Pemasukan)}</p>
+                </div>
+                <div className="p-2 rounded-xl bg-rose-50/70 border border-rose-100">
+                  <span className="text-[10px] text-rose-800 font-medium">Pengeluaran:</span>
+                  <p className="font-mono font-bold text-rose-600 mt-0.5">{formatRupiah(m.Pengeluaran)}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between text-xs pt-1 border-t border-stone-100">
+                <span className="text-slate-500 text-[11px]">Arus Kas Bersih:</span>
+                <span className={`font-mono font-bold ${m.Net >= 0 ? 'text-slate-900' : 'text-rose-600'}`}>
+                  {formatRupiah(m.Net)}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table (hidden on <sm) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-stone-100 text-slate-700 font-bold border-b border-stone-200">
               <tr>

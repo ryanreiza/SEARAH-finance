@@ -16,6 +16,7 @@ import {
   X,
 } from 'lucide-react';
 import { SearahLogo } from '../common/SearahLogo';
+import { PWAInstallButton } from '../common/PWAInstallButton';
 
 interface BottomNavProps {
   currentTab: string;
@@ -48,21 +49,36 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, onSelectTab })
       {/* Mobile Drawer for other tabs */}
       {isMoreOpen && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex flex-col justify-end lg:hidden animate-in fade-in">
-          <div className="bg-white rounded-t-3xl max-h-[80vh] overflow-y-auto p-5 pb-8 shadow-2xl space-y-4">
+          <div className="bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto p-4 sm:p-5 pb-10 shadow-2xl space-y-3.5 safe-area-pb">
             <div className="flex items-center justify-between pb-3 border-b border-stone-200">
               <div className="flex items-center gap-2">
                 <SearahLogo variant="horizontal" size="sm" />
-                <span className="text-xs font-semibold text-slate-400 border-l border-slate-200 pl-2">Menu</span>
+                <span className="text-xs font-semibold text-slate-400 border-l border-slate-200 pl-2">Menu Lengkap</span>
               </div>
               <button
                 onClick={() => setIsMoreOpen(false)}
-                className="p-1.5 rounded-xl hover:bg-stone-100 text-slate-500 cursor-pointer"
+                className="p-1.5 rounded-xl hover:bg-stone-100 text-slate-500 cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                aria-label="Tutup Menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 pt-1">
+            {/* PWA Install Promo in Drawer */}
+            <div className="bg-gradient-to-r from-[#0B2747] to-[#0d3b66] rounded-2xl p-3 text-white flex items-center justify-between gap-3 shadow-sm border border-white/10">
+              <div className="min-w-0">
+                <p className="font-bold text-xs text-white flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-[#14B8A6] animate-pulse" />
+                  Install SEARAH di HP
+                </p>
+                <p className="text-[10px] text-teal-100/80 truncate">
+                  Akses instan dari layar utama Android & iPhone
+                </p>
+              </div>
+              <PWAInstallButton variant="button" />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 pt-1">
               {moreTabs.map((item) => {
                 const Icon = item.icon;
                 const isActive = currentTab === item.id;

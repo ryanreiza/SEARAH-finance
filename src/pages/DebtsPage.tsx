@@ -96,28 +96,28 @@ export const DebtsPage: React.FC = () => {
       />
 
       {/* Tabs */}
-      <div className="flex p-1 bg-stone-200/60 rounded-2xl w-fit">
+      <div className="flex p-1 bg-stone-200/60 rounded-2xl w-full sm:w-fit">
         <button
           onClick={() => setActiveTab('debt')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer min-h-[40px] ${
             activeTab === 'debt'
               ? 'bg-white text-rose-700 shadow-xs'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <CreditCard className="w-4 h-4" />
-          Utang Saya ({debts.filter((d) => d.type === 'debt').length})
+          <CreditCard className="w-4 h-4 shrink-0" />
+          <span>Utang ({debts.filter((d) => d.type === 'debt').length})</span>
         </button>
         <button
           onClick={() => setActiveTab('receivable')}
-          className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer ${
+          className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl text-xs font-bold transition cursor-pointer min-h-[40px] ${
             activeTab === 'receivable'
               ? 'bg-white text-emerald-700 shadow-xs'
               : 'text-slate-600 hover:text-slate-900'
           }`}
         >
-          <ArrowDownLeft className="w-4 h-4" />
-          Piutang Orang Lain ({debts.filter((d) => d.type === 'receivable').length})
+          <ArrowDownLeft className="w-4 h-4 shrink-0" />
+          <span>Piutang ({debts.filter((d) => d.type === 'receivable').length})</span>
         </button>
       </div>
 

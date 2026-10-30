@@ -150,88 +150,209 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="card-bento p-4 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <div className="card-bento p-3 sm:p-4 flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         <div className="relative w-full md:w-72">
           <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Cari judul atau catatan transaksi..."
+            placeholder="Cari judul atau catatan..."
             className="w-full pl-9 pr-3.5 py-2 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-stone-50/50"
           />
         </div>
 
-        <div className="flex items-center gap-2 w-full md:w-auto flex-wrap justify-end text-xs">
+        <div className="flex items-center gap-2 w-full md:w-auto flex-wrap text-xs">
           {/* Type tabs */}
-          <div className="flex p-0.5 bg-stone-100 rounded-xl">
+          <div className="grid grid-cols-4 p-0.5 bg-stone-100 rounded-xl w-full sm:w-auto">
             <button
               onClick={() => setSelectedType('all')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
-                selectedType === 'all' ? 'bg-white text-slate-900 shadow-xs' : 'text-slate-500'
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-semibold text-center transition cursor-pointer text-[11px] sm:text-xs ${
+                selectedType === 'all' ? 'bg-white text-slate-900 shadow-xs font-bold' : 'text-slate-500'
               }`}
             >
               Semua
             </button>
             <button
               onClick={() => setSelectedType('expense')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
-                selectedType === 'expense' ? 'bg-white text-rose-700 shadow-xs' : 'text-slate-500'
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-semibold text-center transition cursor-pointer text-[11px] sm:text-xs ${
+                selectedType === 'expense' ? 'bg-white text-rose-700 shadow-xs font-bold' : 'text-slate-500'
               }`}
             >
-              Pengeluaran
+              Keluar
             </button>
             <button
               onClick={() => setSelectedType('income')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
-                selectedType === 'income' ? 'bg-white text-emerald-700 shadow-xs' : 'text-slate-500'
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-semibold text-center transition cursor-pointer text-[11px] sm:text-xs ${
+                selectedType === 'income' ? 'bg-white text-emerald-700 shadow-xs font-bold' : 'text-slate-500'
               }`}
             >
-              Pemasukan
+              Masuk
             </button>
             <button
               onClick={() => setSelectedType('transfer')}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition cursor-pointer ${
-                selectedType === 'transfer' ? 'bg-white text-blue-700 shadow-xs' : 'text-slate-500'
+              className={`px-2.5 sm:px-3 py-1.5 rounded-lg font-semibold text-center transition cursor-pointer text-[11px] sm:text-xs ${
+                selectedType === 'transfer' ? 'bg-white text-blue-700 shadow-xs font-bold' : 'text-slate-500'
               }`}
             >
               Transfer
             </button>
           </div>
 
-          {/* Account Filter */}
-          <select
-            value={selectedAccount}
-            onChange={(e) => setSelectedAccount(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-stone-300 text-xs bg-white text-slate-700"
-          >
-            <option value="all">Semua Rekening</option>
-            {accounts.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            {/* Account Filter */}
+            <select
+              value={selectedAccount}
+              onChange={(e) => setSelectedAccount(e.target.value)}
+              className="flex-1 sm:flex-initial px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs bg-white text-slate-700 focus:outline-none"
+            >
+              <option value="all">Semua Rekening</option>
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
 
-          {/* Category Filter */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-1.5 rounded-xl border border-stone-300 text-xs bg-white text-slate-700"
-          >
-            <option value="all">Semua Kategori</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+            {/* Category Filter */}
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="flex-1 sm:flex-initial px-2.5 py-1.5 rounded-xl border border-stone-300 text-xs bg-white text-slate-700 focus:outline-none"
+            >
+              <option value="all">Semua Kategori</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Transactions Table */}
+      {/* Transactions Container */}
       <div className="card-bento overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View (block on <sm) */}
+        <div className="block sm:hidden divide-y divide-stone-100">
+          {filteredTransactions.length === 0 ? (
+            <div className="py-10 px-4 text-center text-slate-500">
+              <p className="font-semibold text-sm text-slate-800">Tidak ada transaksi yang cocok</p>
+              <p className="text-xs mt-1 text-slate-400">
+                Gunakan tombol "+ Tambah" atau sesuaikan filter pencarian.
+              </p>
+            </div>
+          ) : (
+            filteredTransactions.map((tx) => {
+              const cat = catMap.get(tx.categoryId);
+              const acc = accMap.get(tx.accountId);
+              const toAcc = tx.toAccountId ? accMap.get(tx.toAccountId) : null;
+
+              return (
+                <div key={tx.id} className="p-3.5 space-y-2.5 active:bg-stone-50/80 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                      <div
+                        className="w-8 h-8 rounded-xl shrink-0 flex items-center justify-center text-white mt-0.5 text-xs font-bold"
+                        style={{ backgroundColor: cat?.color || '#0B2747' }}
+                      >
+                        {tx.type === 'income' ? '↓' : tx.type === 'expense' ? '↑' : '⇄'}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-bold text-slate-900 text-xs leading-snug break-words">
+                          {tx.title}
+                        </p>
+                        <div className="flex items-center gap-1.5 flex-wrap mt-0.5 text-[11px] text-slate-500">
+                          <span>{formatTanggal(tx.date)}</span>
+                          <span>•</span>
+                          <span className="font-medium text-slate-700">
+                            {tx.type === 'transfer' ? `${acc?.name} → ${toAcc?.name || 'Lain'}` : acc?.name}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-right shrink-0">
+                      <p
+                        className={`font-mono font-bold text-xs ${
+                          tx.type === 'income'
+                            ? 'text-emerald-700'
+                            : tx.type === 'expense'
+                            ? 'text-rose-600'
+                            : 'text-blue-600'
+                        }`}
+                      >
+                        {tx.type === 'income' ? '+' : tx.type === 'expense' ? '-' : ''}
+                        {formatRupiah(tx.amount)}
+                      </p>
+                      <span className="inline-block mt-0.5 text-[10px] font-medium text-slate-500 bg-stone-100 px-2 py-0.5 rounded-md">
+                        {cat?.name || 'Umum'}
+                      </span>
+                    </div>
+                  </div>
+
+                  {tx.notes && (
+                    <p className="text-[11px] text-slate-500 pl-10.5 line-clamp-2">
+                      {tx.notes}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between pt-1 border-t border-stone-100 text-[11px]">
+                    <div>
+                      {tx.receiptItems && tx.receiptItems.length > 0 && (
+                        <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200">
+                          Struk ({tx.receiptItems.length} item)
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-1 text-slate-400">
+                      {deleteConfirmId === tx.id ? (
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={() => {
+                              deleteTransaction(tx.id);
+                              setDeleteConfirmId(null);
+                            }}
+                            className="px-2 py-1 rounded-md bg-rose-600 text-white text-[10px] font-bold"
+                          >
+                            Hapus
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(null)}
+                            className="px-2 py-1 rounded-md bg-stone-200 text-slate-700 text-[10px]"
+                          >
+                            Batal
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setEditingTx(tx)}
+                            className="p-1.5 rounded-lg text-slate-600 hover:bg-stone-100 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
+                            aria-label="Edit Transaksi"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteConfirmId(tx.id)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-50 cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
+                            aria-label="Hapus Transaksi"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table View (hidden on <sm) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-stone-100/80 text-slate-700 font-bold border-b border-stone-200">
               <tr>
@@ -333,14 +454,14 @@ export const TransactionsPage: React.FC<TransactionsPageProps> = ({
                           <div className="flex items-center justify-center gap-1.5 text-slate-400">
                             <button
                               onClick={() => setEditingTx(tx)}
-                              className="p-1.5 rounded-lg hover:text-slate-800 hover:bg-stone-100 transition cursor-pointer"
+                              className="p-1.5 rounded-lg hover:text-slate-800 hover:bg-stone-100 transition cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
                               title="Edit Transaksi"
                             >
                               <Edit2 className="w-3.5 h-3.5" />
                             </button>
                             <button
                               onClick={() => setDeleteConfirmId(tx.id)}
-                              className="p-1.5 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer"
+                              className="p-1.5 rounded-lg hover:text-rose-600 hover:bg-rose-50 transition cursor-pointer min-w-[32px] min-h-[32px] flex items-center justify-center"
                               title="Hapus Transaksi"
                             >
                               <Trash2 className="w-3.5 h-3.5" />

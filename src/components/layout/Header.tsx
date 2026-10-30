@@ -69,41 +69,43 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 glass-header px-4 sm:px-8 py-3 flex items-center justify-between transition-colors">
+    <header className="sticky top-0 z-40 glass-header px-2.5 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between transition-colors safe-area-pt">
       {/* Left: Brand Logo (Menu Paling Atas) & Month Navigator */}
-      <div className="flex items-center gap-3 sm:gap-4">
+      <div className="flex items-center gap-1.5 sm:gap-4 min-w-0">
         {/* Brand Logo in Top Menu Bar */}
         <div
-          className="flex items-center cursor-pointer group select-none transition-transform active:scale-95"
+          className="flex items-center cursor-pointer group select-none transition-transform active:scale-95 shrink-0"
           onClick={() => onNavigateToTab('dashboard')}
           title="Ke Dashboard SEARAH"
         >
           <SearahLogo variant="horizontal" size="sm" />
         </div>
 
-        <div className="hidden sm:block h-6 w-px bg-slate-200 mx-0.5" />
+        <div className="hidden sm:block h-6 w-px bg-slate-200 mx-0.5 shrink-0" />
 
         {/* Month Selector with subtle buttons */}
-        <div className="flex items-center bg-white border border-slate-200 rounded-2xl p-1 shadow-2xs">
+        <div className="flex items-center bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-2xs shrink-0">
           <button
             onClick={handlePrevMonth}
-            className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[28px] min-h-[28px] flex items-center justify-center"
             title="Bulan Sebelumnya"
+            aria-label="Bulan Sebelumnya"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
-          <div className="px-2.5 sm:px-3 flex items-center gap-2">
-            <Calendar className="w-3.5 h-3.5 text-teal-600 hidden sm:inline" />
-            <span className="text-xs sm:text-sm font-display font-bold text-[#0B2747] tracking-tight whitespace-nowrap">
+          <div className="px-1.5 sm:px-3 flex items-center gap-1 sm:gap-2">
+            <Calendar className="w-3.5 h-3.5 text-teal-600 hidden sm:inline shrink-0" />
+            <span className="text-[11px] sm:text-sm font-display font-bold text-[#0B2747] tracking-tight whitespace-nowrap">
               {formatBulanTahun(currentMonthKey)}
             </span>
           </div>
           <button
             onClick={handleNextMonth}
-            className="p-1.5 rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer"
+            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[28px] min-h-[28px] flex items-center justify-center"
             title="Bulan Berikutnya"
+            aria-label="Bulan Berikutnya"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
           </button>
         </div>
 

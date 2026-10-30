@@ -126,22 +126,24 @@ export const AIAssistantPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-4 pb-12 animate-in fade-in duration-300 flex flex-col h-[calc(100vh-100px)]">
-      <PageHeader
-        icon={<Sparkles className="w-6 h-6 text-teal-brand" />}
-        title="SEARAH AI Assistant"
-        subtitle="Satu Tujuan. Keuangan Lebih Terarah • Konsultasi cerdas, evaluasi anggaran, dan strategi finansial keluarga"
-        actions={
-          <button
-            onClick={clearChatHistory}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 hover:bg-stone-100 text-slate-600 text-xs font-semibold transition cursor-pointer"
-            title="Bersihkan Riwayat Obrolan"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span>Bersihkan Chat</span>
-          </button>
-        }
-      />
+    <div className="space-y-3 sm:space-y-4 pb-2 animate-in fade-in duration-300 flex flex-col h-[calc(100dvh-175px)] sm:h-[calc(100vh-120px)] overflow-hidden">
+      <div className="shrink-0">
+        <PageHeader
+          icon={<Sparkles className="w-6 h-6 text-teal-brand" />}
+          title="SEARAH AI Assistant"
+          subtitle="Satu Tujuan. Keuangan Lebih Terarah • Konsultasi cerdas & strategi finansial keluarga"
+          actions={
+            <button
+              onClick={clearChatHistory}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-stone-300 hover:bg-stone-100 text-slate-600 text-xs font-semibold transition cursor-pointer"
+              title="Bersihkan Riwayat Obrolan"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Bersihkan Chat</span>
+            </button>
+          }
+        />
+      </div>
 
       {/* Filter Context Bar */}
       <div className="card-bento p-3 flex flex-wrap items-center justify-between gap-3 bg-stone-50/80 text-xs">
@@ -242,7 +244,7 @@ export const AIAssistantPage: React.FC = () => {
       </div>
 
       {/* Suggested Prompts Chips */}
-      <div className="flex gap-2 overflow-x-auto pb-1 text-xs">
+      <div className="flex gap-2 overflow-x-auto pb-1 text-xs shrink-0">
         {suggestedPrompts.map((p, idx) => (
           <button
             key={idx}
@@ -255,7 +257,7 @@ export const AIAssistantPage: React.FC = () => {
       </div>
 
       {/* Input Box */}
-      <div className="flex gap-2 bg-white p-2 rounded-2xl border border-stone-300 shadow-sm">
+      <div className="flex gap-2 bg-white p-2 rounded-2xl border border-stone-300 shadow-sm shrink-0">
         <input
           type="text"
           value={inputPrompt}
@@ -266,13 +268,13 @@ export const AIAssistantPage: React.FC = () => {
               handleSendMessage();
             }
           }}
-          placeholder="Tanyakan apapun seputar keuangan keluarga, anggaran, atau tips hemat..."
+          placeholder="Tanyakan seputar keuangan keluarga atau tips hemat..."
           className="flex-1 px-3 py-2 text-xs sm:text-sm focus:outline-none bg-transparent"
         />
         <button
           onClick={() => handleSendMessage()}
           disabled={!inputPrompt.trim() || isTyping}
-          className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition flex items-center gap-1.5 disabled:opacity-40 cursor-pointer"
+          className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs transition flex items-center gap-1.5 disabled:opacity-40 cursor-pointer shrink-0"
         >
           <Send className="w-3.5 h-3.5 text-mint-brand" />
           <span className="hidden sm:inline">Kirim</span>

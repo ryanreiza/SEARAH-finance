@@ -59,6 +59,9 @@
     background-color: hsl(var(--bg-main));
     color: hsl(var(--text-main));
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow-x: hidden;
+    max-width: 100vw;
+    -webkit-tap-highlight-color: transparent;
   }
 
   h1, h2, h3, h4, h5, h6, .font-display {
@@ -69,6 +72,19 @@
   .font-mono, .num-hero {
     font-family: 'JetBrains Mono', monospace;
   }
+}
+
+/* Mobile Safe Area & Inset Utilities */
+.safe-area-pb {
+  padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+}
+
+.safe-area-pt {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.safe-area-mb {
+  margin-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Custom UI Utilities matching SEARAH Brand Guidelines */

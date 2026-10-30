@@ -102,7 +102,7 @@ function MainApp() {
         />
 
         {/* Scrollable Page Body max-w-[1440px] */}
-        <main className="flex-1 w-full max-w-[1440px] mx-auto px-4 sm:px-8 pt-6 pb-24 lg:pb-12">
+        <main className="flex-1 w-full max-w-[1440px] mx-auto px-3 sm:px-8 pt-4 sm:pt-6 pb-28 lg:pb-12 overflow-x-hidden min-w-0">
           {renderActivePage()}
         </main>
 

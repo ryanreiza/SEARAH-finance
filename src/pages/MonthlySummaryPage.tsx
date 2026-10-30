@@ -195,18 +195,71 @@ export const MonthlySummaryPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Comparison Detail Table */}
+      {/* Comparison Detail Container */}
       <div className="card-bento overflow-hidden">
-        <div className="p-5 border-b border-stone-200 flex items-center justify-between">
+        <div className="p-4 sm:p-5 border-b border-stone-200 flex items-center justify-between">
           <h3 className="font-display font-bold text-sm text-slate-900">
-            Perincian Komparasi per Kategori Pengeluaran
+            Perincian Komparasi per Pos Pengeluaran
           </h3>
           <span className="text-xs text-slate-400 font-mono">
-            {categoryComparison.length} Kategori Terpantau
+            {categoryComparison.length} Kategori
           </span>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Card List (block on <sm) */}
+        <div className="block sm:hidden divide-y divide-stone-100">
+          {categoryComparison.map(({ cat, expected, actual, diff, percent }) => {
+            const isOver = diff < 0;
+
+            return (
+              <div key={cat.id} className="p-3.5 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: cat.color }}
+                    />
+                    <span className="font-bold text-xs text-slate-900">{cat.name}</span>
+                  </div>
+                  <span
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isOver ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-800'
+                    }`}
+                  >
+                    {isOver ? `Over ${formatRupiah(Math.abs(diff))}` : `Sisa ${formatRupiah(diff)}`}
+                  </span>
+                </div>
+
+                <div className="flex justify-between items-baseline text-xs">
+                  <span className="text-slate-500 text-[11px]">
+                    Ekspektasi: <span className="font-mono text-slate-700">{formatRupiah(expected)}</span>
+                  </span>
+                  <span className="font-mono font-bold text-slate-900">
+                    Aktual: <span className={isOver ? 'text-rose-600' : 'text-slate-900'}>{formatRupiah(actual)}</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[10px] text-slate-400 font-mono">
+                    <span>Terpakai {percent}%</span>
+                    <span>{isOver ? 'Melebihi target' : 'Aman terkendali'}</span>
+                  </div>
+                  <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full ${
+                        percent > 100 ? 'bg-rose-500' : percent > 85 ? 'bg-amber-500' : 'bg-emerald-600'
+                      }`}
+                      style={{ width: `${Math.min(100, percent)}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop Table View (hidden on <sm) */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-left border-collapse text-xs">
             <thead className="bg-stone-100/80 text-slate-700 font-bold border-b border-stone-200">
               <tr>

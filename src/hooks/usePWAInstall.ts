@@ -9,18 +9,25 @@ export function usePWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isAndroid, setIsAndroid] = useState(false);
+  const [isChrome, setIsChrome] = useState(false);
 
   useEffect(() => {
-    // Detect standalone mode (already installed)
+    // Detect standalone mode (already installed on phone home screen)
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       (window.navigator as unknown as { standalone?: boolean }).standalone === true;
     setIsInstalled(isStandalone);
 
-    // Detect iOS devices
-    const userAgent = window.navigator.userAgent.toLowerCase();
+    // Detect platform
+    const userAgent = (window.navigator.userAgent || '').toLowerCase();
     const isIOSDevice = /iphone|ipad|ipod/.test(userAgent);
+    const isAndroidDevice = /android/.test(userAgent);
+    const isChromeBrowser = /chrome|crios/.test(userAgent) && !/edge|edg|opr|opera/.test(userAgent);
+
     setIsIOS(isIOSDevice);
+    setIsAndroid(isAndroidDevice);
+    setIsChrome(isChromeBrowser);
 
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
@@ -41,14 +48,18 @@ export function usePWAInstall() {
     };
   }, []);
 
-  const install = async () => {
+  const install = async (): Promise<boolean> => {
     if (!deferredPrompt) return false;
-    await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      setIsInstalled(true);
-      setDeferredPrompt(null);
-      return true;
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        setIsInstalled(true);
+        setDeferredPrompt(null);
+        return true;
+      }
+    } catch (err) {
+      console.warn('PWA install error:', err);
     }
     return false;
   };
@@ -57,6 +68,8 @@ export function usePWAInstall() {
     isInstallable: !!deferredPrompt,
     isInstalled,
     isIOS,
+    isAndroid,
+    isChrome,
     install,
   };
 }
