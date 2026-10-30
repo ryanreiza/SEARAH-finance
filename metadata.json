@@ -1,0 +1,6 @@
+{
+  "name": "SEARAH - AI Family Finance",
+  "description": "Satu Tujuan. Keuangan Lebih Terarah. Aplikasi web manajemen finansial keluarga (PWA): anggaran, transaksi, tabungan, cicilan utang, target bulanan, laporan, dan asisten AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
