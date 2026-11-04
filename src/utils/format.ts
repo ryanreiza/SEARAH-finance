@@ -66,6 +66,18 @@ export function formatBulanTahun(monthKey: string): string {
   }
 }
 
+export function formatBulanTahunSingkat(monthKey: string): string {
+  // Compact for mobile: "2026-10" -> "Okt 2026"
+  if (!monthKey || !monthKey.includes('-')) return monthKey;
+  try {
+    const [year, month] = monthKey.split('-');
+    const date = new Date(parseInt(year, 10), parseInt(month, 10) - 1, 1);
+    return date.toLocaleDateString('id-ID', { month: 'short', year: 'numeric' });
+  } catch {
+    return monthKey;
+  }
+}
+
 export function getCurrentMonthKey(): string {
   const now = new Date();
   const year = now.getFullYear();

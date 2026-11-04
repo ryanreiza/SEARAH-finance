@@ -18,6 +18,7 @@ import { TransactionsPage } from './pages/TransactionsPage';
 import { AccountsPage } from './pages/AccountsPage';
 import { CategoriesPage } from './pages/CategoriesPage';
 import { SavingsPage } from './pages/SavingsPage';
+import { GoldSavingsPage } from './pages/GoldSavingsPage';
 import { DebtsPage } from './pages/DebtsPage';
 import { MonthlyTargetsPage } from './pages/MonthlyTargetsPage';
 import { MonthlySummaryPage } from './pages/MonthlySummaryPage';
@@ -62,6 +63,8 @@ function MainApp() {
         return <CategoriesPage />;
       case 'savings':
         return <SavingsPage />;
+      case 'gold-savings':
+        return <GoldSavingsPage />;
       case 'debts':
         return <DebtsPage />;
       case 'monthly-targets':
@@ -106,8 +109,12 @@ function MainApp() {
           {renderActivePage()}
         </main>
 
-        {/* Mobile Glass Bottom Navigation */}
-        <BottomNav currentTab={currentTab} onSelectTab={(tab) => setCurrentTab(tab)} />
+        {/* Mobile Bottom Navigation with Center Docked FAB */}
+        <BottomNav
+          currentTab={currentTab}
+          onSelectTab={(tab) => setCurrentTab(tab)}
+          onOpenQuickInput={handleOpenQuickInput}
+        />
       </div>
 
       {/* Multimodal Transaction Input Modal (Chat WA, Voice Note, Struk OCR, Manual Form) */}

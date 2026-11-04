@@ -33,7 +33,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
       return (
         <div className="flex items-center gap-2 text-xs font-semibold text-emerald-800 bg-emerald-50 px-3.5 py-2 rounded-2xl border border-emerald-200">
           <Check className="w-4 h-4 text-emerald-600" />
-          <span>Aplikasi SEARAH Sudah Terpasang di HP</span>
+          <span>Aplikasi searta Sudah Terpasang di HP</span>
         </div>
       );
     }
@@ -57,12 +57,13 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
   const renderHeader = () => (
     <button
       onClick={handleAction}
-      className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 text-[#0B2747] border border-teal-500/30 text-xs font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 ${className}`}
-      title="Download & Pasang SEARAH di HP (Android / iPhone)"
+      className={`relative flex items-center justify-center p-2 sm:px-3 sm:py-1.5 rounded-xl bg-teal-500/15 hover:bg-teal-500/25 text-[#0B2747] border border-teal-500/30 font-bold transition-all shadow-2xs active:scale-95 cursor-pointer shrink-0 min-w-[34px] min-h-[34px] sm:min-w-0 sm:min-h-0 ${className}`}
+      title="Download & Pasang searta di HP (Android / iPhone)"
+      aria-label="Download dan Pasang Aplikasi di HP"
     >
       <Download className="w-3.5 h-3.5 text-teal-700 shrink-0" />
-      <span className="hidden sm:inline">Download App</span>
-      <span className="sm:hidden text-[11px]">Install</span>
+      <span className="hidden sm:inline text-xs ml-1.5">Download App</span>
+      <span className="sm:hidden absolute -top-1 -right-1 w-2.5 h-2.5 bg-teal-500 rounded-full border-2 border-white animate-pulse" />
     </button>
   );
 
@@ -73,15 +74,26 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
         <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center p-2 shrink-0 border border-white/10 shadow-xs">
           <img
             src="/icon-192.png"
-            alt="SEARAH App Icon"
+            alt="searta App Icon"
             className="w-full h-full object-contain rounded-xl select-none"
           />
         </div>
         <div>
-          <div className="flex items-center gap-2">
-            <h4 className="font-display font-bold text-sm sm:text-base text-white">
-              Pasang Aplikasi SEARAH di HP Anda
-            </h4>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-display font-bold text-sm sm:text-base text-white">
+              Pasang Aplikasi
+            </span>
+            <img
+              src="/assets/aistudio/searta_white.png"
+              alt="searta"
+              className="h-4 sm:h-5 w-auto object-contain select-none"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co.com/JRt2gFkq/searta.png';
+              }}
+            />
+            <span className="font-display font-bold text-sm sm:text-base text-white">
+              di HP Anda
+            </span>
             <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#14B8A6]/20 text-teal-300 border border-[#14B8A6]/40">
               PWA
             </span>
@@ -126,17 +138,30 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
             {/* Header */}
             <div className="flex items-center justify-between pb-4 border-b border-stone-100">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-[#0B2747] p-1.5 flex items-center justify-center shadow-xs">
+                <div className="w-10 h-10 rounded-2xl bg-[#0B2747] p-1.5 flex items-center justify-center shadow-xs shrink-0">
                   <img
-                    src="/icon-192.png"
-                    alt="Logo SEARAH"
+                    src="https://i.ibb.co.com/Z12k7yB6/logo-only.png"
+                    alt="Logo searta"
                     className="w-full h-full object-contain rounded-lg"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = '/icon-192.png';
+                    }}
                   />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-base text-slate-900 leading-tight">
-                    Download Aplikasi SEARAH
-                  </h3>
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="font-display font-bold text-base text-slate-900 leading-tight">
+                      Download Aplikasi
+                    </h3>
+                    <img
+                      src="https://i.ibb.co.com/JRt2gFkq/searta.png"
+                      alt="searta"
+                      className="h-4 sm:h-5 w-auto object-contain mix-blend-multiply"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = '/searta.png';
+                      }}
+                    />
+                  </div>
                   <p className="text-[11px] text-slate-500">
                     Akses instan dari Layar Utama HP Anda
                   </p>
@@ -240,7 +265,7 @@ export const PWAInstallButton: React.FC<PWAInstallButtonProps> = ({
                       Pilih "Install Aplikasi" atau "Tambahkan ke Layar Utama"
                     </p>
                     <p className="text-[11px] text-slate-600 mt-0.5">
-                      Pilih <strong>"Install aplikasi"</strong> (atau <em>Add to Home screen</em>). Aplikasi <strong>SEARAH</strong> akan otomatis terpasang dengan logo resmi di daftar aplikasi Android Anda!
+                      Pilih <strong>"Install aplikasi"</strong> (atau <em>Add to Home screen</em>). Aplikasi <strong>searta</strong> akan otomatis terpasang dengan logo resmi di daftar aplikasi Android Anda!
                     </p>
                   </div>
                 </div>

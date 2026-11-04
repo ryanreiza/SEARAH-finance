@@ -1,10 +1,10 @@
 /**
  * Supabase SQL Schema Generator with Row Level Security (RLS)
- * Siap dijalankan di SQL Editor Supabase untuk deployer aplikasi SEARAH (AI Family Finance).
+ * Siap dijalankan di SQL Editor Supabase untuk deployer aplikasi searta (AI Family Finance).
  */
 
 export const SUPABASE_SCHEMA_SQL = `-- ========================================================
--- SEARAH (AI FAMILY FINANCE) - SKEMA DATABASE SUPABASE DENGAN RLS
+-- searta (AI FAMILY FINANCE) - SKEMA DATABASE SUPABASE DENGAN RLS
 -- Moto: Satu Tujuan. Keuangan Lebih Terarah.
 -- ========================================================
 
@@ -15,7 +15,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
   name TEXT NOT NULL DEFAULT 'Ayah & Ibu',
-  family_name TEXT DEFAULT 'Keluarga SEARAH',
+  family_name TEXT DEFAULT 'Keluarga searta',
   currency TEXT DEFAULT 'IDR',
   theme TEXT DEFAULT 'warm',
   created_at TIMESTAMPTZ DEFAULT NOW(),

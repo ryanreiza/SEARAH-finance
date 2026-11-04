@@ -15,6 +15,7 @@ import {
   AlertTriangle,
   Receipt,
   FileSpreadsheet,
+  Coins,
 } from 'lucide-react';
 import {
   AreaChart,
@@ -29,7 +30,7 @@ import {
 } from 'recharts';
 import { useFinance } from '../context/FinanceContext';
 import { formatRupiah } from '../utils/format';
-import { SearahLambdaA, SearahBrandLogotype } from '../components/common/SearahLogo';
+import { SearahBrandLogotype } from '../components/common/SearahLogo';
 
 interface DashboardPageProps {
   onOpenQuickInput: (initialTab?: 'chat' | 'voice' | 'camera' | 'manual') => void;
@@ -54,6 +55,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     transactions,
     currentMonthKey,
     billReminders,
+    goldPortfolio,
   } = useFinance();
 
   // Generate 6-month historical cashflow data for AreaChart
@@ -132,6 +134,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       ? Math.round((totalSavingsCurrent / totalSavingsTarget) * 100)
       : 0;
 
+  // Gold statistics
+  const goldValuation = Math.round(goldPortfolio.totalGrams * goldPortfolio.currentMarketPrice);
+  const goldUnrealizedProfit = goldValuation - goldPortfolio.totalCostBasis;
+  const goldUnrealizedPercent =
+    goldPortfolio.totalCostBasis > 0
+      ? ((goldUnrealizedProfit / goldPortfolio.totalCostBasis) * 100).toFixed(1)
+      : '0.0';
+
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       {/* SEARAH Brand Greeting Banner as shown in Brand Guide */}
@@ -175,7 +185,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               </span>
               <span className="px-2.5 py-0.5 rounded-full bg-white/10 text-teal-200 text-[11px] font-semibold backdrop-blur-xs border border-white/10 flex items-center gap-1">
                 <Sparkles className="w-3 h-3 text-[#14B8A6]" />
-                Real-Time SEARAH
+                Real-Time searta
               </span>
             </div>
 
@@ -474,6 +484,58 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
+      {/* Portofolio Tabungan Emas Bento Card */}
+      <div className="card-bento p-5 sm:p-6 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-white border-amber-200/90 shadow-2xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-500 to-amber-700 text-white flex items-center justify-center shadow-md shadow-amber-500/20 shrink-0">
+              <Coins className="w-6 h-6 text-amber-200" />
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-display font-bold text-sm text-[#0B2747]">
+                  Portofolio Tabungan Emas
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                  Emas Riil 24K
+                </span>
+              </div>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="font-mono font-black text-xl sm:text-2xl text-[#0B2747]">
+                  {goldPortfolio.totalGrams.toFixed(3)} gram
+                </span>
+                <span className="text-xs text-slate-500 font-mono">
+                  ≈ {formatRupiah(goldValuation)}
+                </span>
+              </div>
+              <p className="text-xs mt-0.5 text-slate-600">
+                Imbal Hasil:{' '}
+                <span
+                  className={`font-mono font-bold ${
+                    goldUnrealizedProfit >= 0 ? 'text-emerald-700' : 'text-rose-700'
+                  }`}
+                >
+                  {goldUnrealizedProfit >= 0 ? '+' : ''}
+                  {formatRupiah(goldUnrealizedProfit)} ({goldUnrealizedProfit >= 0 ? '+' : ''}
+                  {goldUnrealizedPercent}%)
+                </span>{' '}
+                • Harga Pasar: <span className="font-mono font-semibold">{formatRupiah(goldPortfolio.currentMarketPrice)}/g</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 self-end sm:self-auto shrink-0">
+            <button
+              onClick={() => onNavigate('gold-savings')}
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1.5"
+            >
+              <span>Buka Tabungan Emas</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-teal-400" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Bento Grid Bottom: Target Tabungan & Aksi Cepat Finansial */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Target Tabungan (2 cols) */}
@@ -585,7 +647,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200/80 gap-2">
           <div>
             <h3 className="font-display font-extrabold text-sm text-[#0B2747] tracking-tight">
-              Pilar & Nilai Finansial Keluarga SEARAH
+              Pilar & Nilai Finansial Keluarga searta
             </h3>
             <p className="text-xs text-slate-500">
               Prinsip pengelolaan keuangan keluarga harmonis dan terarah

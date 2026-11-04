@@ -11,7 +11,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useFinance } from '../../context/FinanceContext';
-import { formatBulanTahun, formatRupiah } from '../../utils/format';
+import { formatBulanTahun, formatBulanTahunSingkat, formatRupiah } from '../../utils/format';
 import { PWAInstallButton } from '../common/PWAInstallButton';
 import { SearahLogo } from '../common/SearahLogo';
 
@@ -69,25 +69,26 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 glass-header px-2.5 sm:px-8 py-2.5 sm:py-3 flex items-center justify-between transition-colors safe-area-pt">
+    <header className="sticky top-0 z-40 glass-header px-2.5 sm:px-6 md:px-8 py-2 sm:py-3 flex items-center justify-between transition-colors safe-area-pt gap-2">
       {/* Left: Brand Logo (Menu Paling Atas) & Month Navigator */}
-      <div className="flex items-center gap-1.5 sm:gap-4 min-w-0">
+      <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0 shrink-0">
         {/* Brand Logo in Top Menu Bar */}
         <div
           className="flex items-center cursor-pointer group select-none transition-transform active:scale-95 shrink-0"
           onClick={() => onNavigateToTab('dashboard')}
-          title="Ke Dashboard SEARAH"
+          title="Ke Dashboard searta"
         >
+          {/* Single Brand Logo in Top Menu Bar */}
           <SearahLogo variant="horizontal" size="sm" />
         </div>
 
         <div className="hidden sm:block h-6 w-px bg-slate-200 mx-0.5 shrink-0" />
 
-        {/* Month Selector with subtle buttons */}
-        <div className="flex items-center bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-2xs shrink-0">
+        {/* Month Selector with compact mobile styling */}
+        <div className="flex items-center bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-2xs shrink-0">
           <button
             onClick={handlePrevMonth}
-            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[28px] min-h-[28px] flex items-center justify-center"
+            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
             title="Bulan Sebelumnya"
             aria-label="Bulan Sebelumnya"
           >
@@ -96,12 +97,13 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="px-1.5 sm:px-3 flex items-center gap-1 sm:gap-2">
             <Calendar className="w-3.5 h-3.5 text-teal-600 hidden sm:inline shrink-0" />
             <span className="text-[11px] sm:text-sm font-display font-bold text-[#0B2747] tracking-tight whitespace-nowrap">
-              {formatBulanTahun(currentMonthKey)}
+              <span className="sm:hidden">{formatBulanTahunSingkat(currentMonthKey)}</span>
+              <span className="hidden sm:inline">{formatBulanTahun(currentMonthKey)}</span>
             </span>
           </div>
           <button
             onClick={handleNextMonth}
-            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[28px] min-h-[28px] flex items-center justify-center"
+            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
             title="Bulan Berikutnya"
             aria-label="Bulan Berikutnya"
           >
@@ -116,28 +118,29 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Right: Actions, Alerts Popover, PWA Button, Quick Add */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* PWA Install Button */}
+      {/* Right: Actions, Alerts Popover, PWA Button, Quick Add (Desktop) */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+        {/* PWA Install Button (Compact icon on mobile, full on desktop) */}
         <PWAInstallButton variant="header" />
 
-        {/* Budget & Bill Alerts Popover (Complies with UX rule: alert anggaran hanya via popover di header) */}
+        {/* Budget & Bill Alerts Popover */}
         <div className="relative" ref={alertRef}>
           <button
             onClick={() => setIsAlertOpen(!isAlertOpen)}
-            className="relative p-2.5 rounded-2xl bg-white/90 hover:bg-stone-100 border border-stone-200 text-slate-700 transition cursor-pointer shadow-xs"
+            className="relative p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white/90 hover:bg-stone-100 border border-stone-200 text-slate-700 transition cursor-pointer shadow-xs min-w-[34px] min-h-[34px] sm:min-w-0 sm:min-h-0 flex items-center justify-center shrink-0"
             title="Pemberitahuan Anggaran & Tagihan"
+            aria-label="Notifikasi dan Pengingat"
           >
             <Bell className="w-4 h-4" />
             {totalAlertsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+              <span className="absolute -top-1 -right-1 w-4.5 h-4.5 sm:w-5 sm:h-5 bg-rose-500 text-white text-[9px] sm:text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
                 {totalAlertsCount}
               </span>
             )}
           </button>
 
           {isAlertOpen && (
-            <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-3xl bg-white shadow-2xl border border-stone-200 p-4 text-slate-800 z-50 animate-in fade-in zoom-in-95">
+            <div className="absolute right-0 mt-2 w-[calc(100vw-20px)] max-w-sm sm:w-96 rounded-2xl sm:rounded-3xl bg-white shadow-2xl border border-stone-200 p-4 text-slate-800 z-50 animate-in fade-in zoom-in-95">
               <div className="flex items-center justify-between pb-3 border-b border-stone-100">
                 <div className="flex items-center gap-2">
                   <Bell className="w-4 h-4 text-slate-800" />
@@ -221,14 +224,14 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Quick Add Button */}
+        {/* Quick Add Button - Desktop Only (Mobile uses Center Docked FAB in BottomNav) */}
         <button
           onClick={onOpenQuickInput}
-          className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-md transition transform active:scale-95 cursor-pointer"
+          className="hidden sm:flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-md transition transform active:scale-95 cursor-pointer shrink-0"
+          title="Catat Transaksi"
         >
           <Plus className="w-4 h-4 text-mint-brand" />
-          <span className="hidden sm:inline">Catat Transaksi</span>
-          <span className="sm:hidden">Catat</span>
+          <span>Catat Transaksi</span>
         </button>
       </div>
     </header>

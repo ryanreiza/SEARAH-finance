@@ -141,7 +141,7 @@ const handleParseTransaction = async (req: Request, res: Response) => {
 
   let timeoutTimer: NodeJS.Timeout | null = null;
   try {
-    const systemPrompt = `Kamu adalah asisten keuangan pintar keluarga SEARAH (AI Family Finance) Indonesia.
+    const systemPrompt = `Kamu adalah asisten keuangan pintar keluarga searta (AI Family Finance) Indonesia.
 Tugasmu adalah menganalisis pesan percakapan singkat gaya WhatsApp atau rekaman suara tentang transaksi keuangan harian, lalu mengekstrak data terstruktur dalam format JSON murni tanpa markdown/backticks.
 
 Daftar Rekening yang Tersedia: ${accounts.join(', ') || 'BCA, Mandiri, Bank Jago, Dompet Tunai, GoPay, OVO'}
@@ -304,11 +304,11 @@ app.post('/api/ai/chat', async (req: Request, res: Response) => {
     }
 
     const contextStr = context ? JSON.stringify(context, null, 2) : 'Tidak ada data keuangan tambahan.';
-    const systemPrompt = `Anda adalah "SEARAH AI" (AI Family Finance) — penasihat keuangan keluarga pintar, tepercaya, dan kolaboratif dengan moto: "Satu Tujuan. Keuangan Lebih Terarah".
+    const systemPrompt = `Anda adalah "searta AI" (AI Family Finance) — penasihat keuangan keluarga pintar, tepercaya, dan kolaboratif dengan moto: "Satu Tujuan. Keuangan Lebih Terarah".
 Persona: Ramah, hangat ("Halo, Ayah & Ibu"), bijaksana, profesional, dan empatik terhadap dinamika keuangan keluarga.
 Bahasa: Bahasa Indonesia yang santai, solutif, terstruktur jelas (bisa menggunakan bullet point, tips praktis hemat, dan angka nominal Rupiah format Rp1.250.000).
 
-Filosofi Merek SEARAH:
+Filosofi Merek searta:
 - "Dua Jalan, Satu Arah": Melambangkan pasangan suami-istri yang menyatukan tujuan, saling melengkapi, dan melangkah bersama menuju masa depan finansial yang lebih baik.
 - Nilai: Modern, Terpercaya, Berkelanjutan, Kolaboratif.
 
@@ -324,11 +324,11 @@ Tugas Anda:
 
     if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MY_GEMINI_API_KEY') {
       return res.json({
-        reply: `Halo, Ayah & Ibu! 👋 Saya **SEARAH AI** (*AI Family Finance*).
+        reply: `Halo, Ayah & Ibu! 👋 Saya **searta AI** (*AI Family Finance*).
 
 Berdasarkan data keuangan keluarga saat ini, arus kas Anda berada dalam kondisi yang positif dan terkontrol. Sesuai prinsip kita *"Satu Tujuan. Keuangan Lebih Terarah"*, mari kita jaga momentum ini:
 
-💡 **Rekomendasi Cerdas SEARAH:**
+💡 **Rekomendasi Cerdas searta:**
 1. **Prioritaskan Dana Darurat**: Pastikan target dana darurat 3-6 bulan pengeluaran rutin keluarga terus bertumbuh secara otomatis diawal bulan.
 2. **Evaluasi Belanja Harian**: Catat setiap pengeluaran kecil secara disiplin untuk mencegah kebocoran pos belanja impulsif.
 3. **Kolaborasi Pasangan**: Jadwalkan diskusi santai akhir pekan untuk mereview pencapaian target bulanan bersama.
@@ -397,7 +397,7 @@ app.post('/api/ai/financial-advice', async (req: Request, res: Response) => {
 
   try {
     const { financialData } = req.body;
-    const systemPrompt = `Kamu adalah analis keuangan keluarga profesional SEARAH AI. Analisis data keuangan berikut dan berikan penilaian kesehatan finansial serta rekomendasi penghematan konkret dalam JSON murni:
+    const systemPrompt = `Kamu adalah analis keuangan keluarga profesional searta AI. Analisis data keuangan berikut dan berikan penilaian kesehatan finansial serta rekomendasi penghematan konkret dalam JSON murni:
 {
   "financialHealthScore": number (1-100),
   "healthStatus": "Sangat Sehat" | "Baik" | "Perlu Perhatian" | "Kritis",
@@ -445,6 +445,15 @@ app.post('/api/ai/financial-advice', async (req: Request, res: Response) => {
   }
 });
 
+// Health check endpoints for pre-warming and container probes
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).send('OK');
+});
+
+app.get('/api/health', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Setup Vite middleware in dev or static files in production
 async function startServer() {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -465,9 +474,35 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, HOST, () => {
-    console.log(`SEARAH - AI Family Finance server running at http://${HOST}:${PORT}`);
+  const server = app.listen(PORT, HOST, () => {
+    console.log(`searta - AI Family Finance server running at http://${HOST}:${PORT}`);
+  });
+
+  server.on('error', (err: any) => {
+    console.error('Server listen error:', err);
   });
 }
 
-startServer();
+// Global exception and rejection handlers
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, exiting gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, exiting gracefully');
+  process.exit(0);
+});
+
+startServer().catch((err) => {
+  console.error('Fatal error starting server:', err);
+  process.exit(1);
+});

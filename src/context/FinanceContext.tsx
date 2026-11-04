@@ -11,10 +11,14 @@ import {
   UserProfile,
   ThemeName,
   AllocationStatus,
+  GoldTransaction,
+  GoldPortfolio,
 } from '../types';
 import { generateId, getCurrentMonthKey } from '../utils/format';
 
-export const DEFAULT_SEARAH_SYMBOL = '/assets/aistudio/image_9d6c892c.png';
+export const DEFAULT_SEARAH_SYMBOL = 'https://i.ibb.co.com/Z12k7yB6/logo-only.png';
+export const DEFAULT_SEARTA_SYMBOL = DEFAULT_SEARAH_SYMBOL;
+export const DEFAULT_SEARTA_WORDMARK = 'https://i.ibb.co.com/JRt2gFkq/searta.png';
 
 interface FinanceContextType {
   // Data
@@ -30,10 +34,32 @@ interface FinanceContextType {
   currentMonthKey: string;
   setCurrentMonthKey: (key: string) => void;
 
-  // Custom Brand Symbol
+  // Tabungan Emas (Gold Savings & Portfolio)
+  goldPortfolio: GoldPortfolio;
+  goldTransactions: GoldTransaction[];
+  buyGold: (params: {
+    grams: number;
+    pricePerGram: number;
+    accountId: string;
+    date: string;
+    notes?: string;
+  }) => { success: boolean; error?: string };
+  sellGold: (params: {
+    grams: number;
+    pricePerGram: number;
+    accountId: string;
+    date: string;
+    notes?: string;
+  }) => { success: boolean; error?: string; realizedProfit?: number };
+  updateGoldMarketPrice: (newPrice: number) => void;
+
+  // Custom Brand Symbol & Wordmark
   customSymbolUrl: string;
   updateCustomSymbol: (url: string) => void;
   resetCustomSymbol: () => void;
+  customWordmarkUrl: string;
+  updateCustomWordmark: (url: string) => void;
+  resetCustomWordmark: () => void;
 
   // Actions: Transactions
   addTransaction: (tx: Omit<Transaction, 'id' | 'createdAt'>) => void;
@@ -161,6 +187,7 @@ const initialCategories: Category[] = [
   { id: 'cat_gaji', name: 'Gaji Pokok & Tunjangan', type: 'income', icon: 'Briefcase', color: '#1B8258', monthlyBudget: 18000000 },
   { id: 'cat_bonus', name: 'Bonus & Freelance', type: 'income', icon: 'Sparkles', color: '#25B18B', monthlyBudget: 3000000 },
   { id: 'cat_investasi_in', name: 'Bagi Hasil & Investasi', type: 'income', icon: 'TrendingUp', color: '#0284C7', monthlyBudget: 1000000 },
+  { id: 'cat_jual_emas', name: 'Hasil Jual Emas', type: 'income', icon: 'Coins', color: '#D97706', monthlyBudget: 0 },
   // Expense
   { id: 'cat_makan', name: 'Makanan & Minuman', type: 'expense', icon: 'Utensils', color: '#EA580C', monthlyBudget: 3500000 },
   { id: 'cat_belanja', name: 'Belanja Harian & Dapur', type: 'expense', icon: 'ShoppingBag', color: '#D97706', monthlyBudget: 2800000 },
@@ -171,6 +198,7 @@ const initialCategories: Category[] = [
   { id: 'cat_hiburan', name: 'Hiburan & Santai', type: 'expense', icon: 'Film', color: '#059669', monthlyBudget: 1000000 },
   { id: 'cat_sedekah', name: 'Zakat & Sedekah', type: 'expense', icon: 'HandHeart', color: '#0D9488', monthlyBudget: 800000 },
   { id: 'cat_cicilan', name: 'Cicilan & Utang', type: 'expense', icon: 'CreditCard', color: '#9333EA', monthlyBudget: 3200000 },
+  { id: 'cat_beli_emas', name: 'Tabungan & Beli Emas', type: 'expense', icon: 'Coins', color: '#F59E0B', monthlyBudget: 2000000 },
   { id: 'cat_lain', name: 'Lain-lain', type: 'expense', icon: 'MoreHorizontal', color: '#64748B', monthlyBudget: 500000 },
 ];
 
@@ -526,7 +554,7 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
           {
             id: 'msg_welcome',
             role: 'assistant',
-            content: `Halo Ayah & Ibu! 👋 Selamat datang di SEARAH — AI Family Finance.
+            content: `Halo Ayah & Ibu! 👋 Selamat datang di searta — AI Family Finance.
 
 Prinsip kami: "Satu Tujuan. Keuangan Lebih Terarah". Saya siap mendampingi perjalanan finansial keluarga Anda: mencatat transaksi cepat lewat teks atau struk, menganalisis arus kas, hingga merealisasikan target tabungan bersama.
 
@@ -542,17 +570,21 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
       ? JSON.parse(saved)
       : {
           name: 'Ayah & Ibu',
-          familyName: 'Keluarga SEARAH',
-          email: 'keluarga@searah.app',
+          familyName: 'Keluarga searta',
+          email: 'keluarga@searta.app',
           currency: 'IDR',
           theme: 'warm',
           isSupabaseConnected: false,
         };
   });
 
-  // Custom Brand Symbol (default: newly provided glowing ribbon S emblem)
+  // Custom Brand Symbol (default: official logo from user URL: https://i.ibb.co.com/Z12k7yB6/logo-only.png)
   const [customSymbolUrl, setCustomSymbolUrl] = useState<string>(() => {
-    return localStorage.getItem('searah_custom_symbol') || DEFAULT_SEARAH_SYMBOL;
+    const saved = localStorage.getItem('searah_custom_symbol');
+    if (!saved || saved.includes('image_9d6c892c') || saved.includes('logo-searah.png') || saved.includes('W45MD6xs')) {
+      return DEFAULT_SEARAH_SYMBOL;
+    }
+    return saved;
   });
 
   const updateCustomSymbol = (url: string) => {
@@ -573,7 +605,116 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
     }
   };
 
+  // Custom Brand Wordmark (default: official wordmark link https://i.ibb.co.com/JRt2gFkq/searta.png)
+  const [customWordmarkUrl, setCustomWordmarkUrl] = useState<string>(() => {
+    const saved = localStorage.getItem('searta_custom_wordmark');
+    if (!saved || saved.includes('image_8656fce1') || saved.includes('image_6ea4677b') || saved.includes('xq4DDGM9') || saved.includes('image_fc31f80b')) {
+      return DEFAULT_SEARTA_WORDMARK;
+    }
+    return saved || DEFAULT_SEARTA_WORDMARK;
+  });
+
+  const updateCustomWordmark = (url: string) => {
+    setCustomWordmarkUrl(url);
+    try {
+      localStorage.setItem('searta_custom_wordmark', url);
+    } catch (e) {
+      console.warn('Failed to save wordmark to localStorage:', e);
+    }
+  };
+
+  const resetCustomWordmark = () => {
+    setCustomWordmarkUrl(DEFAULT_SEARTA_WORDMARK);
+    try {
+      localStorage.removeItem('searta_custom_wordmark');
+    } catch (e) {
+      console.warn('Failed to reset wordmark in localStorage:', e);
+    }
+  };
+
+  // Tabungan Emas (Gold Portfolio & Transactions)
+  const defaultGoldPortfolio: GoldPortfolio = {
+    totalGrams: 3.5,
+    totalCostBasis: 4970000,
+    currentMarketPrice: 1485000,
+    realizedProfitTotal: 230000,
+  };
+
+  const defaultGoldTransactions: GoldTransaction[] = [
+    {
+      id: 'gt_1',
+      type: 'buy',
+      date: '2026-08-15',
+      grams: 2.0,
+      pricePerGram: 1410000,
+      totalAmount: 2820000,
+      accountId: 'acc_bca',
+      accountName: 'BCA Utama Ayah',
+      notes: 'Beli emas pertama untuk tabungan masa depan',
+      createdAt: '2026-08-15T09:30:00Z',
+    },
+    {
+      id: 'gt_2',
+      type: 'buy',
+      date: '2026-09-20',
+      grams: 2.5,
+      pricePerGram: 1430000,
+      totalAmount: 3575000,
+      accountId: 'acc_mandiri',
+      accountName: 'Mandiri Tabungan Ibu',
+      notes: 'Tambah porsi tabungan emas bulanan',
+      createdAt: '2026-09-20T14:15:00Z',
+    },
+    {
+      id: 'gt_3',
+      type: 'sell',
+      date: '2026-10-10',
+      grams: 1.0,
+      pricePerGram: 1470000,
+      totalAmount: 1470000,
+      accountId: 'acc_bca',
+      accountName: 'BCA Utama Ayah',
+      costBasisPerGram: 1240000,
+      realizedProfit: 230000,
+      realizedProfitPercent: 18.5,
+      notes: 'Pencairan parsial emas untuk tambahan kas keluarga',
+      createdAt: '2026-10-10T11:00:00Z',
+    },
+  ];
+
+  const [goldPortfolio, setGoldPortfolio] = useState<GoldPortfolio>(() => {
+    const saved = localStorage.getItem('searta_gold_portfolio');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to parse gold portfolio:', e);
+      }
+    }
+    return defaultGoldPortfolio;
+  });
+
+  const [goldTransactions, setGoldTransactions] = useState<GoldTransaction[]>(() => {
+    const saved = localStorage.getItem('searta_gold_transactions');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to parse gold transactions:', e);
+      }
+    }
+    return defaultGoldTransactions;
+  });
+
   // Sync state to LocalStorage
+  useEffect(() => {
+    localStorage.setItem('searta_gold_portfolio', JSON.stringify(goldPortfolio));
+  }, [goldPortfolio]);
+
+  useEffect(() => {
+    localStorage.setItem('searta_gold_transactions', JSON.stringify(goldTransactions));
+  }, [goldTransactions]);
+
   useEffect(() => {
     localStorage.setItem('keu_keluarga_accounts', JSON.stringify(accounts));
   }, [accounts]);
@@ -939,6 +1080,187 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
     return mapped.length;
   };
 
+  // Actions: Tabungan Emas (Beli & Jual Emas)
+  const buyGold = (params: {
+    grams: number;
+    pricePerGram: number;
+    accountId: string;
+    date: string;
+    notes?: string;
+  }): { success: boolean; error?: string } => {
+    const { grams, pricePerGram, accountId, date, notes } = params;
+    if (grams <= 0 || pricePerGram <= 0) {
+      return { success: false, error: 'Jumlah gram dan harga beli harus lebih dari 0' };
+    }
+
+    const totalAmount = Math.round(grams * pricePerGram);
+    const targetAccount = accounts.find((a) => a.id === accountId);
+    if (!targetAccount) {
+      return { success: false, error: 'Rekening sumber dana tidak ditemukan' };
+    }
+
+    if (targetAccount.balance < totalAmount) {
+      return {
+        success: false,
+        error: `Saldo ${targetAccount.name} tidak cukup (Tersedia: Rp${targetAccount.balance.toLocaleString('id-ID')}, Dibutuhkan: Rp${totalAmount.toLocaleString('id-ID')})`,
+      };
+    }
+
+    // 1. Potong saldo rekening bank
+    setAccounts((prev) =>
+      prev.map((acc) =>
+        acc.id === accountId ? { ...acc, balance: acc.balance - totalAmount } : acc
+      )
+    );
+
+    // 2. Tambahkan mutasi pengeluaran ke buku kas utama
+    const linkedTxId = generateId('tx_gold_buy');
+    const newTx: Transaction = {
+      id: linkedTxId,
+      title: `Beli Emas ${grams.toFixed(3)}g`,
+      amount: totalAmount,
+      type: 'expense',
+      categoryId: 'cat_beli_emas',
+      accountId,
+      date: date || new Date().toISOString().split('T')[0],
+      notes: notes || `Pembelian tabungan emas ${grams.toFixed(3)}g @ Rp${pricePerGram.toLocaleString('id-ID')}/g`,
+      createdAt: new Date().toISOString(),
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+
+    // 3. Perbarui portofolio emas
+    setGoldPortfolio((prev) => {
+      const newTotalGrams = Number((prev.totalGrams + grams).toFixed(3));
+      const newTotalCostBasis = prev.totalCostBasis + totalAmount;
+      return {
+        ...prev,
+        totalGrams: newTotalGrams,
+        totalCostBasis: newTotalCostBasis,
+      };
+    });
+
+    // 4. Catat riwayat transaksi emas
+    const newGoldTx: GoldTransaction = {
+      id: generateId('gt'),
+      type: 'buy',
+      date: date || new Date().toISOString().split('T')[0],
+      grams: Number(grams.toFixed(3)),
+      pricePerGram,
+      totalAmount,
+      accountId,
+      accountName: targetAccount.name,
+      linkedTransactionId: linkedTxId,
+      notes,
+      createdAt: new Date().toISOString(),
+    };
+    setGoldTransactions((prev) => [newGoldTx, ...prev]);
+
+    return { success: true };
+  };
+
+  const sellGold = (params: {
+    grams: number;
+    pricePerGram: number;
+    accountId: string;
+    date: string;
+    notes?: string;
+  }): { success: boolean; error?: string; realizedProfit?: number } => {
+    const { grams, pricePerGram, accountId, date, notes } = params;
+    if (grams <= 0 || pricePerGram <= 0) {
+      return { success: false, error: 'Jumlah gram dan harga jual harus lebih dari 0' };
+    }
+
+    if (grams > goldPortfolio.totalGrams + 0.0001) {
+      return {
+        success: false,
+        error: `Saldo emas tidak mencukupi (Tersedia: ${goldPortfolio.totalGrams.toFixed(3)}g, Ingin jual: ${grams.toFixed(3)}g)`,
+      };
+    }
+
+    const targetAccount = accounts.find((a) => a.id === accountId);
+    if (!targetAccount) {
+      return { success: false, error: 'Rekening penerima hasil jual tidak ditemukan' };
+    }
+
+    const totalReceived = Math.round(grams * pricePerGram);
+    const avgCostPerGram =
+      goldPortfolio.totalGrams > 0
+        ? goldPortfolio.totalCostBasis / goldPortfolio.totalGrams
+        : pricePerGram;
+    const modalPokok = Math.round(grams * avgCostPerGram);
+    const realizedProfit = totalReceived - modalPokok;
+    const realizedProfitPercent = modalPokok > 0 ? (realizedProfit / modalPokok) * 100 : 0;
+
+    // 1. Tambahkan dana masuk ke rekening bank yang dipilih
+    setAccounts((prev) =>
+      prev.map((acc) =>
+        acc.id === accountId ? { ...acc, balance: acc.balance + totalReceived } : acc
+      )
+    );
+
+    // 2. Tambahkan mutasi pemasukan baru ke buku kas utama lengkap dengan modal & laba rugi
+    const linkedTxId = generateId('tx_gold_sell');
+    const profitSign = realizedProfit >= 0 ? '+' : '';
+    const formattedProfit = `Rp${Math.abs(realizedProfit).toLocaleString('id-ID')}`;
+    const txNote = `Jual ${grams.toFixed(3)}g @ Rp${pricePerGram.toLocaleString('id-ID')}/g | Modal Pokok: Rp${modalPokok.toLocaleString('id-ID')} | Laba/Rugi: ${profitSign}${formattedProfit} (${realizedProfitPercent >= 0 ? '+' : ''}${realizedProfitPercent.toFixed(1)}%)${notes ? ` - ${notes}` : ''}`;
+
+    const newTx: Transaction = {
+      id: linkedTxId,
+      title: `Jual Emas ${grams.toFixed(3)}g`,
+      amount: totalReceived,
+      type: 'income',
+      categoryId: 'cat_jual_emas',
+      accountId,
+      date: date || new Date().toISOString().split('T')[0],
+      notes: txNote,
+      createdAt: new Date().toISOString(),
+    };
+    setTransactions((prev) => [newTx, ...prev]);
+
+    // 3. Perbarui portofolio emas
+    setGoldPortfolio((prev) => {
+      const remainingGrams = Number(Math.max(0, prev.totalGrams - grams).toFixed(3));
+      const remainingCostBasis =
+        remainingGrams === 0 ? 0 : Math.max(0, prev.totalCostBasis - modalPokok);
+      return {
+        ...prev,
+        totalGrams: remainingGrams,
+        totalCostBasis: remainingCostBasis,
+        realizedProfitTotal: prev.realizedProfitTotal + realizedProfit,
+      };
+    });
+
+    // 4. Catat riwayat transaksi emas
+    const newGoldTx: GoldTransaction = {
+      id: generateId('gt'),
+      type: 'sell',
+      date: date || new Date().toISOString().split('T')[0],
+      grams: Number(grams.toFixed(3)),
+      pricePerGram,
+      totalAmount: totalReceived,
+      accountId,
+      accountName: targetAccount.name,
+      costBasisPerGram: Math.round(avgCostPerGram),
+      realizedProfit,
+      realizedProfitPercent: Number(realizedProfitPercent.toFixed(2)),
+      linkedTransactionId: linkedTxId,
+      notes,
+      createdAt: new Date().toISOString(),
+    };
+    setGoldTransactions((prev) => [newGoldTx, ...prev]);
+
+    return { success: true, realizedProfit };
+  };
+
+  const updateGoldMarketPrice = (newPrice: number) => {
+    if (newPrice > 0) {
+      setGoldPortfolio((prev) => ({
+        ...prev,
+        currentMarketPrice: Math.round(newPrice),
+      }));
+    }
+  };
+
   const resetAllData = () => {
     setAccounts(initialAccounts);
     setCategories(initialCategories);
@@ -946,13 +1268,17 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
     setSavingsGoals(initialSavingsGoals);
     setDebts(initialDebts);
     setBillReminders(initialBillReminders);
+    setGoldPortfolio(defaultGoldPortfolio);
+    setGoldTransactions(defaultGoldTransactions);
     const curKey = getCurrentMonthKey();
     setMonthlyPlans({ [curKey]: createDefaultMonthlyPlan(curKey) });
     clearChatHistory();
   };
 
-  // Computed Values
-  const totalNetWorth = accounts.reduce((sum, a) => sum + (a.isActive ? a.balance : 0), 0);
+  // Computed Values (Termasuk Valuasi Aset Emas)
+  const totalGoldValuation = Math.round(goldPortfolio.totalGrams * goldPortfolio.currentMarketPrice);
+  const totalNetWorth =
+    accounts.reduce((sum, a) => sum + (a.isActive ? a.balance : 0), 0) + totalGoldValuation;
 
   const currentMonthTransactions = transactions.filter((t) => t.date.startsWith(currentMonthKey));
 
@@ -1008,6 +1334,13 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
         currentMonthKey,
         setCurrentMonthKey,
 
+        // Tabungan Emas
+        goldPortfolio,
+        goldTransactions,
+        buyGold,
+        sellGold,
+        updateGoldMarketPrice,
+
         addTransaction,
         updateTransaction,
         deleteTransaction,
@@ -1051,6 +1384,10 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
         customSymbolUrl,
         updateCustomSymbol,
         resetCustomSymbol,
+
+        customWordmarkUrl,
+        updateCustomWordmark,
+        resetCustomWordmark,
 
         totalNetWorth,
         totalIncomeCurrentMonth,

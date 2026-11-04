@@ -69,6 +69,12 @@
     letter-spacing: -0.02em;
   }
 
+  .font-searta {
+    font-family: 'Nunito', 'Fredoka', 'Plus Jakarta Sans', system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
   .font-mono, .num-hero {
     font-family: 'JetBrains Mono', monospace;
   }

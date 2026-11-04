@@ -1,9 +1,9 @@
 /**
- * Service Worker for SEARAH - AI Family Finance
+ * Service Worker for searta - AI Family Finance
  * Supports offline asset caching, app installability on Chromium/Android, and background sync.
  */
 
-const CACHE_NAME = 'searah-v1';
+const CACHE_NAME = 'searta-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',

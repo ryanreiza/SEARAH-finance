@@ -130,3 +130,27 @@ export interface UserProfile {
   supabaseAnonKey?: string;
   isSupabaseConnected: boolean;
 }
+
+export interface GoldTransaction {
+  id: string;
+  type: 'buy' | 'sell';
+  date: string; // YYYY-MM-DD
+  grams: number;
+  pricePerGram: number;
+  totalAmount: number;
+  accountId: string;
+  accountName: string;
+  costBasisPerGram?: number; // Harga modal per gram saat penjualan
+  realizedProfit?: number; // Untung/rugi bersih dalam Rp (khusus 'sell')
+  realizedProfitPercent?: number; // Persentase untung/rugi (khusus 'sell')
+  linkedTransactionId?: string; // ID transaksi di buku kas umum
+  notes?: string;
+  createdAt: string;
+}
+
+export interface GoldPortfolio {
+  totalGrams: number;
+  totalCostBasis: number; // Total modal rupiah yang dibayarkan untuk gram aktif
+  currentMarketPrice: number; // Harga acuan pasar dinamis per gram (Rp)
+  realizedProfitTotal: number; // Total keuntungan terealisasi dari penjualan lampau (Rp)
+}

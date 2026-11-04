@@ -133,7 +133,7 @@ export const ReportsPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-display font-extrabold text-base text-slate-900">
-                  Rekomendasi Cerdas SEARAH AI
+                  Rekomendasi Cerdas searta AI
                 </h3>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800">
                   {aiAdvice?.healthStatus || 'Finansial Baik'}

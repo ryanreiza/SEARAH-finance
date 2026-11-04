@@ -13,8 +13,9 @@ import {
   Bot,
   Settings,
   Sparkles,
+  Coins,
 } from 'lucide-react';
-import { useFinance } from '../../context/FinanceContext';
+import { useFinance, DEFAULT_SEARAH_SYMBOL } from '../../context/FinanceContext';
 import { formatRupiah } from '../../utils/format';
 import { SearahLogo } from '../common/SearahLogo';
 
@@ -24,7 +25,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => {
-  const { totalNetWorth, userProfile } = useFinance();
+  const { totalNetWorth, userProfile, customSymbolUrl } = useFinance();
 
   const navigationItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -32,6 +33,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     { id: 'accounts', label: 'Rekening Bank', icon: Landmark },
     { id: 'categories', label: 'Kategori', icon: Layers },
     { id: 'savings', label: 'Tabungan', icon: PiggyBank },
+    { id: 'gold-savings', label: 'Tabungan Emas', icon: Coins, badge: 'Emas' },
     { id: 'debts', label: 'Utang & Cicilan', icon: Scale },
     { id: 'monthly-targets', label: 'Target Bulanan', icon: Target },
     { id: 'monthly-summary', label: 'Ringkasan Bulanan', icon: FileSpreadsheet },
@@ -105,15 +107,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
       {/* User Family Profile Footer (Halo, Ayah & Ibu) */}
       <div className="p-4 border-t border-[#1E3A5F]/80 flex items-center justify-between bg-[#071A30]">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#14B8A6] to-teal-700 flex items-center justify-center text-white font-display font-extrabold text-xs shadow-xs">
-            S
+          <div className="w-9 h-9 rounded-xl bg-white/10 p-1 flex items-center justify-center text-white shrink-0 border border-white/10 shadow-xs">
+            <img
+              src={customSymbolUrl}
+              alt="searta logo"
+              className="w-full h-full object-contain rounded-md"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = DEFAULT_SEARAH_SYMBOL;
+              }}
+            />
           </div>
           <div className="overflow-hidden">
-            <p className="text-xs font-bold text-white leading-tight truncate">
-              Ayah & Ibu
-            </p>
-            <p className="text-[10px] text-teal-300/80 truncate">
-              Keluarga SEARAH
+            <div className="flex items-center gap-1.5">
+              <img
+                src="/assets/aistudio/searta_white.png"
+                alt="searta"
+                className="h-3.5 w-auto object-contain select-none"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = 'https://i.ibb.co.com/JRt2gFkq/searta.png';
+                }}
+              />
+            </div>
+            <p className="text-[10px] text-teal-300/80 truncate mt-0.5">
+              Keluarga {userProfile?.familyName || 'Ayah & Ibu'}
             </p>
           </div>
         </div>

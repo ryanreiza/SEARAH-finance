@@ -130,7 +130,7 @@ export const AIAssistantPage: React.FC = () => {
       <div className="shrink-0">
         <PageHeader
           icon={<Sparkles className="w-6 h-6 text-teal-brand" />}
-          title="SEARAH AI Assistant"
+          title="searta AI Assistant"
           subtitle="Satu Tujuan. Keuangan Lebih Terarah • Konsultasi cerdas & strategi finansial keluarga"
           actions={
             <button
@@ -149,7 +149,7 @@ export const AIAssistantPage: React.FC = () => {
       <div className="card-bento p-3 flex flex-wrap items-center justify-between gap-3 bg-stone-50/80 text-xs">
         <div className="flex items-center gap-2 text-slate-500 font-semibold">
           <Filter className="w-3.5 h-3.5 text-teal-brand" />
-          <span>Konteks Analisis SEARAH AI:</span>
+          <span>Konteks Analisis searta AI:</span>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
@@ -236,7 +236,7 @@ export const AIAssistantPage: React.FC = () => {
             </div>
             <div className="p-3.5 rounded-2xl bg-stone-100 border border-stone-200 text-xs text-slate-600 flex items-center gap-2">
               <Loader2 className="w-4 h-4 animate-spin text-teal-600" />
-              <span>SEARAH AI sedang menganalisis data keuangan keluarga...</span>
+              <span>searta AI sedang menganalisis data keuangan keluarga...</span>
             </div>
           </div>
         )}

@@ -313,7 +313,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
             </div>
             <div>
               <h2 className="font-display font-bold text-base text-navy-brand">
-                Catat Transaksi Cepat • SEARAH AI
+                Catat Transaksi Cepat • searta AI
               </h2>
               <p className="text-xs text-slate-500">
                 Pilih metode: Chat WA, Voice Note, Foto Struk, atau Form Manual

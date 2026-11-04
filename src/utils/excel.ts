@@ -5,11 +5,11 @@ export async function exportTransactionsToExcel(
   transactions: Transaction[],
   categories: Category[],
   accounts: Account[],
-  filename: string = 'Laporan_Transaksi_SEARAH_Finance.xlsx'
+  filename: string = 'Laporan_Transaksi_searta_Finance.xlsx'
 ) {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'SEARAH - AI Family Finance';
-  workbook.lastModifiedBy = 'SEARAH';
+  workbook.creator = 'searta - AI Family Finance';
+  workbook.lastModifiedBy = 'searta';
   workbook.created = new Date();
   workbook.modified = new Date();
 
@@ -24,7 +24,7 @@ export async function exportTransactionsToExcel(
   // Title block
   worksheet.mergeCells('A1:G1');
   const titleCell = worksheet.getCell('A1');
-  titleCell.value = 'SEARAH • LAPORAN TRANSAKSI KEUANGAN KELUARGA';
+  titleCell.value = 'searta • LAPORAN TRANSAKSI KEUANGAN KELUARGA';
   titleCell.font = { name: 'Arial', size: 14, bold: true, color: { argb: 'FF0B2747' } };
   titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
   worksheet.getRow(1).height = 30;

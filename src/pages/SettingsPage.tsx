@@ -17,7 +17,11 @@ import {
   CheckCircle2,
   Sparkles,
 } from 'lucide-react';
-import { useFinance, DEFAULT_SEARAH_SYMBOL } from '../context/FinanceContext';
+import {
+  useFinance,
+  DEFAULT_SEARAH_SYMBOL,
+  DEFAULT_SEARTA_WORDMARK,
+} from '../context/FinanceContext';
 import { PageHeader } from '../components/common/PageHeader';
 import { ThemeName } from '../types';
 import { SUPABASE_SCHEMA_SQL } from '../utils/supabaseSql';
@@ -40,6 +44,9 @@ export const SettingsPage: React.FC = () => {
     customSymbolUrl,
     updateCustomSymbol,
     resetCustomSymbol,
+    customWordmarkUrl,
+    updateCustomWordmark,
+    resetCustomWordmark,
   } = useFinance();
 
   const [copiedSql, setCopiedSql] = useState(false);
@@ -108,7 +115,7 @@ export const SettingsPage: React.FC = () => {
   // Full JSON backup export
   const handleExportFullBackup = () => {
     const fullBackup = {
-      app: 'SEARAH - AI Family Finance',
+      app: 'searta - AI Family Finance',
       version: '1.0.0',
       exportedAt: new Date().toISOString(),
       userProfile,
@@ -127,7 +134,7 @@ export const SettingsPage: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `Backup_SEARAH_Finance_${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `Backup_searta_Finance_${new Date().toISOString().split('T')[0]}.json`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -190,7 +197,7 @@ export const SettingsPage: React.FC = () => {
               Filosofi Logo: Dua Jalan, Satu Arah
             </h4>
             <p className="text-xs text-slate-700 leading-relaxed">
-              Simbol <strong>SEARAH</strong> terinspirasi dari dua jalur kehidupan yang bertemu dan bergerak ke arah yang sama. Melambangkan pasangan suami-istri yang menyatukan visi, saling melengkapi, dan melangkah bersama menuju masa depan finansial yang kokoh.
+              Simbol <strong>searta</strong> terinspirasi dari dua jalur kehidupan yang bertemu dan bergerak ke arah yang sama. Melambangkan pasangan suami-istri yang menyatukan visi, saling melengkapi, dan melangkah bersama menuju masa depan finansial yang kokoh.
             </p>
             <div className="flex items-center gap-3 pt-1 text-[11px] text-slate-500 font-medium">
               <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-teal-brand" />Dua Jalur Pasangan</span>
@@ -202,7 +209,7 @@ export const SettingsPage: React.FC = () => {
           {/* Brand Colors */}
           <div className="p-4 rounded-2xl bg-white border border-stone-200/90 space-y-2.5">
             <h4 className="font-bold text-xs uppercase tracking-wider text-slate-500">
-              Palet Warna Resmi SEARAH
+              Palet Warna Resmi searta
             </h4>
             <div className="grid grid-cols-2 gap-2 text-[11px]">
               <div className="flex items-center gap-2 p-2 rounded-xl bg-slate-50 border border-slate-100">
@@ -636,7 +643,7 @@ export const SettingsPage: React.FC = () => {
                     type="button"
                     onClick={() => {
                       updateCustomSymbol(DEFAULT_SEARAH_SYMBOL);
-                      setUploadSuccess('Simbol Ribbon Cyan aktif!');
+                      setUploadSuccess('Logo Resmi searta aktif!');
                       setTimeout(() => setUploadSuccess(null), 3000);
                     }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-medium border flex items-center gap-2 transition cursor-pointer ${
@@ -647,10 +654,10 @@ export const SettingsPage: React.FC = () => {
                   >
                     <img
                       src={DEFAULT_SEARAH_SYMBOL}
-                      alt="Preset Ribbon Cyan"
+                      alt="Logo Resmi searta"
                       className="w-4 h-4 object-contain rounded-xs"
                     />
-                    <span>Simbol Ribbon Cyan (Default)</span>
+                    <span>Logo Resmi searta (Default)</span>
                   </button>
 
                   <button
@@ -676,27 +683,112 @@ export const SettingsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* 6. Brand Identity & Filosofi SEARAH */}
+      {/* 6. Brand Identity & Logotype searta */}
       <div className="card-bento p-6 space-y-5 bg-gradient-to-br from-white to-slate-50 border-slate-200">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
           <div>
             <h3 className="font-display font-bold text-base text-[#0B2747]">
-              Identitas Merek & Logotype SEARAH
+              Nama & Logotype Web Aplikasi (searta)
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Tipografi 'Sans Serif Geometris' dengan custom logotype huruf "A" berbentuk segitiga tanpa palang horizontal (Lambda / mata panah ke atas).
+              Tipografi bulat modern dan geometris (lowercase "searta") menggunakan aset resmi dari tautan gambar resmi.
             </p>
           </div>
-          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200 w-fit">
-            Sans Serif Geometris (Custom 'A')
+          <span className="px-3 py-1 rounded-full text-[11px] font-bold bg-teal-50 text-teal-800 border border-teal-200 w-fit flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-teal-600" />
+            Tautan Aktif: {DEFAULT_SEARTA_WORDMARK}
           </span>
         </div>
 
+        {/* Wordmark Previews across Light and Dark */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Light Context (Header, Navigation, Cards) */}
+          <div className="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-2">
+            <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+              Pratinjau di Header & Kartu (Latar Terang)
+            </span>
+            <div className="p-4 rounded-xl bg-[#F8FAFC] border border-slate-100 flex items-center justify-center min-h-[64px]">
+              <img
+                src={customWordmarkUrl || DEFAULT_SEARTA_WORDMARK}
+                alt="searta wordmark light"
+                className="h-7 w-auto object-contain mix-blend-multiply"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = '/searta.png';
+                }}
+              />
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Digunakan di Header atas, menu navigasi, dan pop-up dialog.
+            </p>
+          </div>
+
+          {/* Dark Context (Sidebar, Banner, Mobile Splash) */}
+          <div className="p-4 rounded-2xl bg-[#0B2747] text-white border border-[#1E3A5F] shadow-sm space-y-2">
+            <span className="text-[10px] font-bold text-teal-300 uppercase tracking-wider block">
+              Pratinjau di Sidebar & PWA Banner (Latar Gelap)
+            </span>
+            <div className="p-4 rounded-xl bg-[#071A30] border border-[#1E3A5F] flex items-center justify-center min-h-[64px]">
+              <img
+                src="/assets/aistudio/searta_white.png"
+                alt="searta wordmark dark"
+                className="h-7 w-auto object-contain"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = customWordmarkUrl || DEFAULT_SEARTA_WORDMARK;
+                }}
+              />
+            </div>
+            <p className="text-[11px] text-teal-200/80">
+              Digunakan di Sidebar desktop, bilah bawah mobile, dan banner PWA.
+            </p>
+          </div>
+        </div>
+
+        {/* Wordmark URL Field & Controls */}
+        <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/90 space-y-3">
+          <label className="block text-xs font-bold text-slate-700">
+            Alamat URL Gambar Nama Web Aplikasi:
+          </label>
+          <div className="flex flex-col sm:flex-row items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={DEFAULT_SEARTA_WORDMARK}
+              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 bg-white font-mono text-xs text-slate-800 select-all"
+            />
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(DEFAULT_SEARTA_WORDMARK);
+                alert('Tautan gambar searta berhasil disalin!');
+              }}
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 transition cursor-pointer whitespace-nowrap"
+            >
+              <Copy className="w-3.5 h-3.5" />
+              <span>Salin URL</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                resetCustomWordmark();
+                alert('Nama web aplikasi berhasil direset ke tautan resmi searta.png!');
+              }}
+              className="w-full sm:w-auto px-3.5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition cursor-pointer whitespace-nowrap"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-slate-500" />
+              <span>Reset Default</span>
+            </button>
+          </div>
+          <p className="text-[11px] text-slate-500">
+            Aset ini otomatis tersinkronisasi ke seluruh komponen: <strong>Header & Navigasi</strong>, <strong>Sidebar & Footer</strong>, <strong>PWA & Mobile Install</strong>, serta laporan aplikasi.
+          </p>
+        </div>
+
+        {/* Combined Showcase with Logo & Tagline */}
         <div className="p-6 rounded-2xl bg-white border border-slate-200/80 shadow-2xs flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-3 text-center md:text-left">
             <SearahLogo variant="horizontal" size="lg" showTagline />
             <p className="text-xs text-slate-600 max-w-md leading-relaxed mt-2">
-              <strong className="text-[#0B2747]">Custom Logotype "A":</strong> Huruf "A" dimodifikasi khusus berbentuk segitiga tajam tanpa garis horizontal, merepresentasikan simbol mata panah ke atas atau huruf Yunani Lambda (Λ) — lambang pertumbuhan, progresivitas, dan visi finansial keluarga yang terus terarah ke masa depan.
+              <strong className="text-[#0B2747]">Identitas searta:</strong> Menggabungkan simbol "Dua Jalan, Satu Arah" dengan nama merek bulat yang bersahabat untuk menyatukan visi keuangan seluruh anggota keluarga menuju masa depan yang mapan.
             </p>
           </div>
 
