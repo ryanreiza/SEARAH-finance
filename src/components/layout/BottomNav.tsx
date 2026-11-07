@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Home,
   LayoutDashboard,
   ReceiptText,
   Target,
@@ -8,7 +9,7 @@ import {
   Landmark,
   Layers,
   PiggyBank,
-  Scale,
+  CalendarClock,
   FileSpreadsheet,
   PieChart,
   CalendarDays,
@@ -33,25 +34,26 @@ export const BottomNav: React.FC<BottomNavProps> = ({
 }) => {
   const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-  // Left slots (Ringkasan & Transaksi)
+  // Left slots (Beranda & Keuangan)
   const leftTabs = [
-    { id: 'dashboard', label: 'Ringkasan', icon: LayoutDashboard },
-    { id: 'transactions', label: 'Transaksi', icon: ReceiptText },
+    { id: 'home', label: 'Beranda', icon: Home },
+    { id: 'dashboard', label: 'Keuangan', icon: LayoutDashboard },
   ];
 
-  // Right slots (Tanya AI)
+  // Right slots (Transaksi)
   const rightTabs = [
-    { id: 'ai-assistant', label: 'Tanya AI', icon: Bot, isSpecial: true },
+    { id: 'transactions', label: 'Transaksi', icon: ReceiptText },
   ];
 
   // All other features in Drawer
   const moreTabs = [
+    { id: 'ai-assistant', label: 'Tanya AI', icon: Bot, desc: 'Penasihat finansial cerdas', isSpecial: true },
+    { id: 'gold-savings', label: 'Tabungan Emas', icon: Coins, desc: 'Gram, beli & jual emas realtime' },
     { id: 'monthly-targets', label: 'Target Anggaran', icon: Target, desc: 'Target 50/30/20 & batas pengeluaran' },
     { id: 'accounts', label: 'Rekening Bank', icon: Landmark, desc: 'Kelola saldo & transfer akun' },
     { id: 'categories', label: 'Kategori', icon: Layers, desc: 'Pemasukan & pengeluaran' },
     { id: 'savings', label: 'Tabungan', icon: PiggyBank, desc: 'Target dan progres impian' },
-    { id: 'gold-savings', label: 'Tabungan Emas', icon: Coins, desc: 'Gram, beli & jual emas realtime' },
-    { id: 'debts', label: 'Utang & Piutang', icon: Scale, desc: 'Pantau sisa cicilan' },
+    { id: 'debts', label: 'Tagihan & Utang', icon: CalendarClock, desc: 'Pantau sisa cicilan & jatuh tempo' },
     { id: 'monthly-summary', label: 'Ringkasan Bulanan', icon: FileSpreadsheet, desc: 'Expected vs Actual' },
     { id: 'reports', label: 'Laporan & Grafik', icon: PieChart, desc: 'Budget vs Actual & rekomendasi' },
     { id: 'yearly', label: 'Tahunan', icon: CalendarDays, desc: 'Rekap 12 bulan' },

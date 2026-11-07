@@ -1,11 +1,12 @@
 import React from 'react';
 import {
+  Home,
   LayoutDashboard,
   ReceiptText,
   Landmark,
   Layers,
   PiggyBank,
-  Scale,
+  CalendarClock,
   Target,
   FileSpreadsheet,
   PieChart,
@@ -28,13 +29,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
   const { totalNetWorth, userProfile, customSymbolUrl } = useFinance();
 
   const navigationItems = [
+    { id: 'home', label: 'Beranda', icon: Home },
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'transactions', label: 'Transaksi', icon: ReceiptText },
     { id: 'accounts', label: 'Rekening Bank', icon: Landmark },
     { id: 'categories', label: 'Kategori', icon: Layers },
     { id: 'savings', label: 'Tabungan', icon: PiggyBank },
     { id: 'gold-savings', label: 'Tabungan Emas', icon: Coins, badge: 'Emas' },
-    { id: 'debts', label: 'Utang & Cicilan', icon: Scale },
+    { id: 'debts', label: 'Tagihan & Cicilan', icon: CalendarClock },
     { id: 'monthly-targets', label: 'Target Bulanan', icon: Target },
     { id: 'monthly-summary', label: 'Ringkasan Bulanan', icon: FileSpreadsheet },
     { id: 'reports', label: 'Laporan & Analitik', icon: PieChart },
@@ -47,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentTab, onSelectTab }) => 
     <aside className="hidden lg:flex flex-col w-72 shrink-0 h-screen sticky top-0 bg-[#0B2747] text-[#F8FAFC] border-r border-[#1E3A5F] select-none z-30">
       {/* Brand Header with SEARAH Logo */}
       <div className="p-6 pb-4 border-b border-[#1E3A5F]/80">
-        <div className="cursor-pointer" onClick={() => onSelectTab('dashboard')}>
+        <div className="cursor-pointer" onClick={() => onSelectTab('home')}>
           <SearahLogo variant="monochrome-white" size="md" />
         </div>
         <p className="text-[11px] font-medium text-teal-300/80 mt-2 tracking-tight">

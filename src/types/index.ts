@@ -154,3 +154,13 @@ export interface GoldPortfolio {
   currentMarketPrice: number; // Harga acuan pasar dinamis per gram (Rp)
   realizedProfitTotal: number; // Total keuntungan terealisasi dari penjualan lampau (Rp)
 }
+
+export interface FamilyAgendaItem {
+  id: string;
+  title: string;
+  categoryName: string;
+  dueDate?: string; // YYYY-MM-DD
+  isCompleted: boolean;
+  priority?: 'high' | 'normal' | 'low';
+  createdAt: string;
+}

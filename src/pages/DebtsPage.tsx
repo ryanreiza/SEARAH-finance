@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  Scale,
+  CalendarClock,
   Plus,
   ArrowDownLeft,
   ArrowUpRight,
@@ -81,8 +81,8 @@ export const DebtsPage: React.FC = () => {
   return (
     <div className="space-y-6 pb-12 animate-in fade-in duration-300">
       <PageHeader
-        icon={<Scale className="w-6 h-6 text-mint-brand" />}
-        title="Utang & Piutang"
+        icon={<CalendarClock className="w-6 h-6 text-mint-brand" />}
+        title="Tagihan & Utang Piutang"
         subtitle="Pantau sisa cicilan, piutang ke pihak lain, dan jadwalkan pembayaran tepat waktu"
         actions={
           <button

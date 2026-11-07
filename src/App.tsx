@@ -13,6 +13,7 @@ import { DataMigrationModal } from './components/modals/DataMigrationModal';
 import { OfflineIndicator } from './components/common/OfflineIndicator';
 
 // Pages
+import { HomePage } from './pages/HomePage';
 import { DashboardPage } from './pages/DashboardPage';
 import { TransactionsPage } from './pages/TransactionsPage';
 import { AccountsPage } from './pages/AccountsPage';
@@ -28,7 +29,7 @@ import { AIAssistantPage } from './pages/AIAssistantPage';
 import { SettingsPage } from './pages/SettingsPage';
 
 function MainApp() {
-  const [currentTab, setCurrentTab] = useState<string>('dashboard');
+  const [currentTab, setCurrentTab] = useState<string>('home');
 
   // Modals state
   const [isQuickInputOpen, setIsQuickInputOpen] = useState(false);
@@ -42,6 +43,14 @@ function MainApp() {
 
   const renderActivePage = () => {
     switch (currentTab) {
+      case 'home':
+        return (
+          <HomePage
+            onNavigate={(tab) => setCurrentTab(tab)}
+            onOpenQuickInput={handleOpenQuickInput}
+            onOpenMigration={() => setIsMigrationOpen(true)}
+          />
+        );
       case 'dashboard':
         return (
           <DashboardPage
@@ -99,6 +108,7 @@ function MainApp() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Sticky Header with Month picker, Alerts popover & Quick Add */}
         <Header
+          currentTab={currentTab}
           onOpenQuickInput={() => handleOpenQuickInput('chat')}
           onOpenDataMigration={() => setIsMigrationOpen(true)}
           onNavigateToTab={(tab) => setCurrentTab(tab)}

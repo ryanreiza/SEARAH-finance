@@ -13,6 +13,7 @@ import {
   AllocationStatus,
   GoldTransaction,
   GoldPortfolio,
+  FamilyAgendaItem,
 } from '../types';
 import { generateId, getCurrentMonthKey } from '../utils/format';
 
@@ -95,6 +96,12 @@ interface FinanceContextType {
   deleteBillReminder: (id: string) => void;
   payBill: (billId: string, accountId: string) => void;
 
+  // Actions: Family Financial Agenda & To-Do
+  familyAgenda: FamilyAgendaItem[];
+  addAgendaItem: (item: Omit<FamilyAgendaItem, 'id' | 'createdAt'>) => void;
+  toggleAgendaItem: (id: string) => void;
+  deleteAgendaItem: (id: string) => void;
+
   // Actions: Monthly Budget & Allocations
   updateMonthlyPlan: (monthKey: string, plan: Partial<MonthlyBudgetPlan>) => void;
   toggleFixedExpense: (monthKey: string, expenseId: string) => void;
@@ -106,6 +113,8 @@ interface FinanceContextType {
 
   // Actions: Profile & Settings
   setTheme: (theme: ThemeName) => void;
+  isDarkMode: boolean;
+  toggleDarkMode: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
   importExternalTransactions: (newTransactions: Omit<Transaction, 'id' | 'createdAt'>[]) => number;
   resetAllData: () => void;
@@ -314,6 +323,45 @@ const initialBillReminders: BillReminder[] = [
     categoryId: 'cat_kesehatan',
     preferredAccountId: 'acc_mandiri',
     isPaid: false,
+  },
+];
+
+const initialFamilyAgenda: FamilyAgendaItem[] = [
+  {
+    id: 'agenda_1',
+    title: 'Motor Gear - Jadwal Maintenance',
+    categoryName: 'Jadwal Maintenance',
+    dueDate: '2026-11-06',
+    isCompleted: false,
+    priority: 'high',
+    createdAt: '2026-11-01T08:00:00Z',
+  },
+  {
+    id: 'agenda_2',
+    title: 'Ganti oli mobil',
+    categoryName: 'Jadwal Maintenance',
+    dueDate: '2026-11-04',
+    isCompleted: true,
+    priority: 'normal',
+    createdAt: '2026-11-01T09:00:00Z',
+  },
+  {
+    id: 'agenda_3',
+    title: 'Cek tagihan & token listrik',
+    categoryName: 'Jadwal Bayar & Belanja',
+    dueDate: '2026-11-06',
+    isCompleted: false,
+    priority: 'high',
+    createdAt: '2026-11-02T10:00:00Z',
+  },
+  {
+    id: 'agenda_4',
+    title: 'Review pos belanja mingguan',
+    categoryName: 'Evaluasi Keuangan',
+    dueDate: '2026-11-08',
+    isCompleted: false,
+    priority: 'normal',
+    createdAt: '2026-11-03T11:00:00Z',
   },
 ];
 
@@ -536,6 +584,19 @@ export const FinanceProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return saved ? JSON.parse(saved) : initialBillReminders;
   });
 
+  const [familyAgenda, setFamilyAgenda] = useState<FamilyAgendaItem[]>(() => {
+    const saved = localStorage.getItem('searta_family_agenda');
+    return saved ? JSON.parse(saved) : initialFamilyAgenda;
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('searta_family_agenda', JSON.stringify(familyAgenda));
+    } catch (e) {
+      console.warn('Failed to save familyAgenda to localStorage:', e);
+    }
+  }, [familyAgenda]);
+
   const [monthlyPlans, setMonthlyPlans] = useState<Record<string, MonthlyBudgetPlan>>(() => {
     const saved = localStorage.getItem('keu_keluarga_monthly_plans');
     const plans = saved ? JSON.parse(saved) : {};
@@ -577,6 +638,24 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
           isSupabaseConnected: false,
         };
   });
+
+  // Dark/Light Theme Mode state
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(() => {
+    return localStorage.getItem('searta_dark_mode') === 'true';
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('searta_dark_mode', String(isDarkMode));
+  }, [isDarkMode]);
+
+  const toggleDarkMode = () => {
+    setIsDarkMode((prev) => !prev);
+  };
 
   // Custom Brand Symbol (default: official logo from user URL: https://i.ibb.co.com/Z12k7yB6/logo-only.png)
   const [customSymbolUrl, setCustomSymbolUrl] = useState<string>(() => {
@@ -977,6 +1056,26 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
     });
   };
 
+  // Actions: Family Financial Agenda & To-Do
+  const addAgendaItem = (itemData: Omit<FamilyAgendaItem, 'id' | 'createdAt'>) => {
+    const newItem: FamilyAgendaItem = {
+      ...itemData,
+      id: generateId('agenda'),
+      createdAt: new Date().toISOString(),
+    };
+    setFamilyAgenda((prev) => [newItem, ...prev]);
+  };
+
+  const toggleAgendaItem = (id: string) => {
+    setFamilyAgenda((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, isCompleted: !item.isCompleted } : item))
+    );
+  };
+
+  const deleteAgendaItem = (id: string) => {
+    setFamilyAgenda((prev) => prev.filter((item) => item.id !== id));
+  };
+
   // Actions: Monthly Budget Plans & Allocations
   const updateMonthlyPlan = (monthKey: string, planData: Partial<MonthlyBudgetPlan>) => {
     setMonthlyPlans((prev) => {
@@ -1369,6 +1468,11 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
         deleteBillReminder,
         payBill,
 
+        familyAgenda,
+        addAgendaItem,
+        toggleAgendaItem,
+        deleteAgendaItem,
+
         updateMonthlyPlan,
         toggleFixedExpense,
         copyPlanFromPreviousMonth,
@@ -1377,6 +1481,8 @@ Apa rencana keuangan yang ingin kita diskusikan hari ini?`,
         clearChatHistory,
 
         setTheme,
+        isDarkMode,
+        toggleDarkMode,
         updateUserProfile,
         importExternalTransactions,
         resetAllData,

@@ -1,6 +1,6 @@
 {
-  "summary": "Rencana implementasi arsitektur Sistem Tabungan Emas (Gold Savings & Portfolio) di searta: pelacakan portofolio gram emas, transaksi beli/jual terhubung otomatis ke rekening bank, pemisahan laba rugi dan modal pokok, harga acuan dinamis, widget dashboard, dan menu khusus di drawer/sidebar.",
-  "updatedAt": "2026-11-04T07:54:14.330940954Z",
+  "summary": "Rencana audit menyeluruh dan aktivasi fungsi aplikasi searta:\n1. Peningkatan Pencarian Kilat dengan dropdown instan (fitur, rekening, transaksi, dan agenda).\n2. Perluasan grid Fitur Utama menjadi 14 fitur lengkap saat 'Lihat semua' diklik.\n3. Penggantian ikon Tagihan menjadi CalendarClock (kalender pengingat jatuh tempo).\n4. Aktivasi dinamis tab Agenda Minggu Ini terhubung ke state keluarga.\n5. Penyempurnaan palet warna resmi dan dukungan penuh Dark Mode (Night Mode).",
+  "updatedAt": "2026-11-04T20:46:35.014173763Z",
   "requestFeedback": true,
   "userFacing": true
 }

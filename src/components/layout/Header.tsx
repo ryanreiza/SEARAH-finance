@@ -9,6 +9,8 @@ import {
   Clock,
   Sparkles,
   CheckCircle2,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { useFinance } from '../../context/FinanceContext';
 import { formatBulanTahun, formatBulanTahunSingkat, formatRupiah } from '../../utils/format';
@@ -16,12 +18,14 @@ import { PWAInstallButton } from '../common/PWAInstallButton';
 import { SearahLogo } from '../common/SearahLogo';
 
 interface HeaderProps {
+  currentTab?: string;
   onOpenQuickInput: () => void;
   onOpenDataMigration: () => void;
   onNavigateToTab: (tabId: string) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
+  currentTab,
   onOpenQuickInput,
   onOpenDataMigration,
   onNavigateToTab,
@@ -33,8 +37,11 @@ export const Header: React.FC<HeaderProps> = ({
     billReminders,
     payBill,
     accounts,
+    isDarkMode,
+    toggleDarkMode,
   } = useFinance();
 
+  const isHome = currentTab === 'home';
   const [isAlertOpen, setIsAlertOpen] = useState(false);
   const alertRef = useRef<HTMLDivElement>(null);
 
@@ -75,47 +82,51 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Brand Logo in Top Menu Bar */}
         <div
           className="flex items-center cursor-pointer group select-none transition-transform active:scale-95 shrink-0"
-          onClick={() => onNavigateToTab('dashboard')}
-          title="Ke Dashboard searta"
+          onClick={() => onNavigateToTab('home')}
+          title="Ke Beranda searta"
         >
           {/* Single Brand Logo in Top Menu Bar */}
           <SearahLogo variant="horizontal" size="sm" />
         </div>
 
-        <div className="hidden sm:block h-6 w-px bg-slate-200 mx-0.5 shrink-0" />
+        {/* Month Selector with compact mobile styling - Hidden on Beranda */}
+        {!isHome && (
+          <>
+            <div className="hidden sm:block h-6 w-px bg-slate-200 mx-0.5 shrink-0" />
 
-        {/* Month Selector with compact mobile styling */}
-        <div className="flex items-center bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-2xs shrink-0">
-          <button
-            onClick={handlePrevMonth}
-            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
-            title="Bulan Sebelumnya"
-            aria-label="Bulan Sebelumnya"
-          >
-            <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-          <div className="px-1.5 sm:px-3 flex items-center gap-1 sm:gap-2">
-            <Calendar className="w-3.5 h-3.5 text-teal-600 hidden sm:inline shrink-0" />
-            <span className="text-[11px] sm:text-sm font-display font-bold text-[#0B2747] tracking-tight whitespace-nowrap">
-              <span className="sm:hidden">{formatBulanTahunSingkat(currentMonthKey)}</span>
-              <span className="hidden sm:inline">{formatBulanTahun(currentMonthKey)}</span>
-            </span>
-          </div>
-          <button
-            onClick={handleNextMonth}
-            className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
-            title="Bulan Berikutnya"
-            aria-label="Bulan Berikutnya"
-          >
-            <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-          </button>
-        </div>
+            <div className="flex items-center bg-white border border-slate-200/90 rounded-xl sm:rounded-2xl p-0.5 sm:p-1 shadow-2xs shrink-0">
+              <button
+                onClick={handlePrevMonth}
+                className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
+                title="Bulan Sebelumnya"
+                aria-label="Bulan Sebelumnya"
+              >
+                <ChevronLeft className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+              <div className="px-1.5 sm:px-3 flex items-center gap-1 sm:gap-2">
+                <Calendar className="w-3.5 h-3.5 text-teal-600 hidden sm:inline shrink-0" />
+                <span className="text-[11px] sm:text-sm font-display font-bold text-[#0B2747] tracking-tight whitespace-nowrap">
+                  <span className="sm:hidden">{formatBulanTahunSingkat(currentMonthKey)}</span>
+                  <span className="hidden sm:inline">{formatBulanTahun(currentMonthKey)}</span>
+                </span>
+              </div>
+              <button
+                onClick={handleNextMonth}
+                className="p-1 sm:p-1.5 rounded-lg sm:rounded-xl hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition cursor-pointer min-w-[26px] min-h-[26px] sm:min-w-[28px] sm:min-h-[28px] flex items-center justify-center"
+                title="Bulan Berikutnya"
+                aria-label="Bulan Berikutnya"
+              >
+                <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              </button>
+            </div>
 
-        {/* Brand Tagline in Header for wide screens */}
-        <div className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-500 border-l border-slate-200 pl-4">
-          <span className="w-2 h-2 rounded-full bg-[#14B8A6]" />
-          <span>Satu Tujuan. Keuangan Lebih Terarah.</span>
-        </div>
+            {/* Brand Tagline in Header for wide screens */}
+            <div className="hidden xl:flex items-center gap-2 text-xs font-semibold text-slate-500 border-l border-slate-200 pl-4">
+              <span className="w-2 h-2 rounded-full bg-[#14B8A6]" />
+              <span>Satu Tujuan. Keuangan Lebih Terarah.</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Right: Actions, Alerts Popover, PWA Button, Quick Add (Desktop) */}
@@ -224,15 +235,31 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        {/* Quick Add Button - Desktop Only (Mobile uses Center Docked FAB in BottomNav) */}
+        {/* Night / Day Mode Toggle Button */}
         <button
-          onClick={onOpenQuickInput}
-          className="hidden sm:flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-md transition transform active:scale-95 cursor-pointer shrink-0"
-          title="Catat Transaksi"
+          onClick={toggleDarkMode}
+          className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-white/90 hover:bg-stone-100 dark:bg-slate-800 dark:hover:bg-slate-700 border border-stone-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 transition cursor-pointer shadow-xs min-w-[34px] min-h-[34px] flex items-center justify-center shrink-0"
+          title={isDarkMode ? 'Mode Terang (Day Mode)' : 'Mode Gelap (Night Mode)'}
+          aria-label="Ubah Mode Gelap / Terang"
         >
-          <Plus className="w-4 h-4 text-mint-brand" />
-          <span>Catat Transaksi</span>
+          {isDarkMode ? (
+            <Sun className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-700" />
+          )}
         </button>
+
+        {/* Quick Add Button - Desktop Only (Hidden on Beranda as requested) */}
+        {!isHome && (
+          <button
+            onClick={onOpenQuickInput}
+            className="hidden sm:flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-md transition transform active:scale-95 cursor-pointer shrink-0"
+            title="Catat Transaksi"
+          >
+            <Plus className="w-4 h-4 text-mint-brand" />
+            <span>Catat Transaksi</span>
+          </button>
+        )}
       </div>
     </header>
   );

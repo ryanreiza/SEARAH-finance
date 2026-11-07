@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   X,
   MessageSquare,
@@ -33,6 +33,37 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
   const { accounts, categories, addTransaction } = useFinance();
   const [activeTab, setActiveTab] = useState<'chat' | 'voice' | 'camera' | 'manual'>(initialTab);
 
+  // Controls whether "Tinjau & Konfirmasi Data Transaksi" is shown
+  // Only shown when in 'manual' tab OR after chat/voice/camera extraction succeeds
+  const [hasExtractedData, setHasExtractedData] = useState<boolean>(initialTab === 'manual');
+
+  // Reset modal state whenever opened
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab(initialTab);
+      setHasExtractedData(initialTab === 'manual');
+      setChatInput('');
+      setVoiceTranscript('');
+      setImagePreview(null);
+      setDetectedReceipt(null);
+      setParseSuccessMsg('');
+      setToastMessage(null);
+    }
+  }, [isOpen, initialTab]);
+
+  const isReviewVisible = activeTab === 'manual' || hasExtractedData;
+
+  const handleTabChange = (newTab: 'chat' | 'voice' | 'camera' | 'manual') => {
+    setActiveTab(newTab);
+    if (newTab === 'manual') {
+      setHasExtractedData(true);
+    } else {
+      // For quick input tabs (Chat, Voice, Struk), hide the review form until extracted
+      setHasExtractedData(false);
+      setParseSuccessMsg('');
+    }
+  };
+
   // Parsed draft state
   const [draft, setDraft] = useState<{
     title: string;
@@ -63,6 +94,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
   const [isRecording, setIsRecording] = useState(false);
   const [voiceTranscript, setVoiceTranscript] = useState('');
   const recognitionRef = useRef<any>(null);
+  const latestTranscriptRef = useRef<string>('');
 
   // Camera / Receipt OCR tab state
   const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -157,12 +189,14 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
         });
 
         setParseSuccessMsg(`✨ Transaksi berhasil dideteksi: ${tx.title} (${formatRupiah(tx.amount || 25000)})`);
+        setHasExtractedData(true);
       }
     } catch (err) {
       console.warn('Network parse note, activating instant local parser:', err);
       const localFallback = parseLocalClientTransaction(rawText);
       setDraft(localFallback);
       setParseSuccessMsg(`✨ Transaksi dideteksi: ${localFallback.title} (${formatRupiah(localFallback.amount)})`);
+      setHasExtractedData(true);
     } finally {
       setIsParsing(false);
     }
@@ -193,6 +227,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
       recognition.onstart = () => {
         setIsRecording(true);
         setVoiceTranscript('');
+        latestTranscriptRef.current = '';
       };
 
       recognition.onresult = (event: any) => {
@@ -200,6 +235,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
           .map((res: any) => res[0].transcript)
           .join('');
         setVoiceTranscript(transcript);
+        latestTranscriptRef.current = transcript;
       };
 
       recognition.onerror = (e: any) => {
@@ -210,8 +246,9 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
 
       recognition.onend = () => {
         setIsRecording(false);
-        if (voiceTranscript) {
-          processNaturalLanguageText(voiceTranscript);
+        const textToProcess = latestTranscriptRef.current || voiceTranscript;
+        if (textToProcess && textToProcess.trim()) {
+          processNaturalLanguageText(textToProcess);
         }
       };
 
@@ -264,6 +301,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
             receiptItems: r.items || [],
           });
           setParseSuccessMsg(`✨ OCR Sukses: ${r.merchant} • ${formatRupiah(r.totalAmount)}`);
+          setHasExtractedData(true);
         }
       } catch (err) {
         console.error(err);
@@ -332,7 +370,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
         <div className="grid grid-cols-4 p-2 bg-stone-100/90 border-b border-stone-200 text-xs font-semibold">
           <button
             type="button"
-            onClick={() => setActiveTab('chat')}
+            onClick={() => handleTabChange('chat')}
             className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition cursor-pointer ${
               activeTab === 'chat'
                 ? 'bg-white text-slate-900 shadow-xs border border-stone-200/60 font-bold'
@@ -345,7 +383,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('voice')}
+            onClick={() => handleTabChange('voice')}
             className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition cursor-pointer ${
               activeTab === 'voice'
                 ? 'bg-white text-slate-900 shadow-xs border border-stone-200/60 font-bold'
@@ -358,7 +396,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('camera')}
+            onClick={() => handleTabChange('camera')}
             className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition cursor-pointer ${
               activeTab === 'camera'
                 ? 'bg-white text-slate-900 shadow-xs border border-stone-200/60 font-bold'
@@ -371,7 +409,7 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab('manual')}
+            onClick={() => handleTabChange('manual')}
             className={`flex items-center justify-center gap-1.5 py-2.5 rounded-xl transition cursor-pointer ${
               activeTab === 'manual'
                 ? 'bg-white text-slate-900 shadow-xs border border-stone-200/60 font-bold'
@@ -567,174 +605,176 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
             </div>
           )}
 
-          {/* VERIFY / FORM REVIEW */}
-          <form id="quick-tx-form" onSubmit={handleSubmitFinal} className="space-y-4 pt-2 border-t border-stone-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                Tinjau & Konfirmasi Data Transaksi
-              </h3>
-              {/* Type Switcher */}
-              <div className="flex p-0.5 bg-stone-100 rounded-xl text-xs font-semibold">
-                <button
-                  type="button"
-                  onClick={() => setDraft({ ...draft, type: 'expense' })}
-                  className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                    draft.type === 'expense' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Pengeluaran
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDraft({ ...draft, type: 'income' })}
-                  className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                    draft.type === 'income' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Pemasukan
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDraft({ ...draft, type: 'transfer' })}
-                  className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                    draft.type === 'transfer' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  Transfer
-                </button>
-              </div>
-            </div>
-
-            {/* Title & Amount Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Judul Transaksi
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={draft.title}
-                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  placeholder="Contoh: Belanja Mingguan Superindo"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-sm"
-                />
+          {/* VERIFY / FORM REVIEW (Only shown in Manual tab OR after Chat/Voice/Struk extraction) */}
+          {isReviewVisible && (
+            <form id="quick-tx-form" onSubmit={handleSubmitFinal} className="space-y-4 pt-2 border-t border-stone-200 animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Tinjau & Konfirmasi Data Transaksi
+                </h3>
+                {/* Type Switcher */}
+                <div className="flex p-0.5 bg-stone-100 rounded-xl text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setDraft({ ...draft, type: 'expense' })}
+                    className={`px-3 py-1 rounded-lg transition cursor-pointer ${
+                      draft.type === 'expense' ? 'bg-rose-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Pengeluaran
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDraft({ ...draft, type: 'income' })}
+                    className={`px-3 py-1 rounded-lg transition cursor-pointer ${
+                      draft.type === 'income' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Pemasukan
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDraft({ ...draft, type: 'transfer' })}
+                    className={`px-3 py-1 rounded-lg transition cursor-pointer ${
+                      draft.type === 'transfer' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Transfer
+                  </button>
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Nominal (Rupiah)
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                    Rp
-                  </span>
+              {/* Title & Amount Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Judul Transaksi
+                  </label>
                   <input
                     type="text"
                     required
-                    value={draft.amount ? draft.amount.toLocaleString('id-ID') : ''}
-                    onChange={(e) => {
-                      const val = parseRupiahInput(e.target.value);
-                      setDraft({ ...draft, amount: val });
-                    }}
-                    placeholder="0"
-                    className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-sm font-mono font-bold"
+                    value={draft.title}
+                    onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                    placeholder="Contoh: Belanja Mingguan Superindo"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-sm"
                   />
                 </div>
-              </div>
-            </div>
 
-            {/* Account & Category / Target Account */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                  <Wallet className="w-3.5 h-3.5 text-slate-500" />
-                  {draft.type === 'transfer' ? 'Dari Rekening' : 'Rekening / Dompet'}
-                </label>
-                <select
-                  value={draft.accountId}
-                  onChange={(e) => setDraft({ ...draft, accountId: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
-                >
-                  {accounts.map((acc) => (
-                    <option key={acc.id} value={acc.id}>
-                      {acc.name} ({formatRupiah(acc.balance)})
-                    </option>
-                  ))}
-                </select>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Nominal (Rupiah)
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                      Rp
+                    </span>
+                    <input
+                      type="text"
+                      required
+                      value={draft.amount ? draft.amount.toLocaleString('id-ID') : ''}
+                      onChange={(e) => {
+                        const val = parseRupiahInput(e.target.value);
+                        setDraft({ ...draft, amount: val });
+                      }}
+                      placeholder="0"
+                      className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-sm font-mono font-bold"
+                    />
+                  </div>
+                </div>
               </div>
 
-              {draft.type === 'transfer' ? (
+              {/* Account & Category / Target Account */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                    <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
-                    Ke Rekening Tujuan
+                    <Wallet className="w-3.5 h-3.5 text-slate-500" />
+                    {draft.type === 'transfer' ? 'Dari Rekening' : 'Rekening / Dompet'}
                   </label>
                   <select
-                    value={draft.toAccountId || accounts[1]?.id || ''}
-                    onChange={(e) => setDraft({ ...draft, toAccountId: e.target.value })}
+                    value={draft.accountId}
+                    onChange={(e) => setDraft({ ...draft, accountId: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
                   >
                     {accounts.map((acc) => (
                       <option key={acc.id} value={acc.id}>
-                        {acc.name}
+                        {acc.name} ({formatRupiah(acc.balance)})
                       </option>
                     ))}
                   </select>
                 </div>
-              ) : (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-slate-500" />
-                    Kategori
-                  </label>
-                  <select
-                    value={draft.categoryId}
-                    onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
-                  >
-                    {categories
-                      .filter((c) => (draft.type === 'income' ? c.type === 'income' : c.type === 'expense'))
-                      .map((cat) => (
-                        <option key={cat.id} value={cat.id}>
-                          {cat.name}
+
+                {draft.type === 'transfer' ? (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <ArrowRight className="w-3.5 h-3.5 text-blue-600" />
+                      Ke Rekening Tujuan
+                    </label>
+                    <select
+                      value={draft.toAccountId || accounts[1]?.id || ''}
+                      onChange={(e) => setDraft({ ...draft, toAccountId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
+                    >
+                      {accounts.map((acc) => (
+                        <option key={acc.id} value={acc.id}>
+                          {acc.name}
                         </option>
                       ))}
-                  </select>
+                    </select>
+                  </div>
+                ) : (
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                      <Tag className="w-3.5 h-3.5 text-slate-500" />
+                      Kategori
+                    </label>
+                    <select
+                      value={draft.categoryId}
+                      onChange={(e) => setDraft({ ...draft, categoryId: e.target.value })}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
+                    >
+                      {categories
+                        .filter((c) => (draft.type === 'income' ? c.type === 'income' : c.type === 'expense'))
+                        .map((cat) => (
+                          <option key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Date & Notes */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                    Tanggal Transaksi
+                  </label>
+                  <input
+                    type="date"
+                    value={draft.date}
+                    onChange={(e) => setDraft({ ...draft, date: e.target.value })}
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
+                  />
                 </div>
-              )}
-            </div>
 
-            {/* Date & Notes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                  Tanggal Transaksi
-                </label>
-                <input
-                  type="date"
-                  value={draft.date}
-                  onChange={(e) => setDraft({ ...draft, date: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs bg-white"
-                />
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-slate-500" />
+                    Catatan / Keterangan (Opsional)
+                  </label>
+                  <input
+                    type="text"
+                    value={draft.notes}
+                    onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
+                    placeholder="Catatan tambahan..."
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
+                  />
+                </div>
               </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1 flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-slate-500" />
-                  Catatan / Keterangan (Opsional)
-                </label>
-                <input
-                  type="text"
-                  value={draft.notes}
-                  onChange={(e) => setDraft({ ...draft, notes: e.target.value })}
-                  placeholder="Catatan tambahan..."
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:outline-none focus:ring-2 focus:ring-slate-900 text-xs"
-                />
-              </div>
-            </div>
-          </form>
+            </form>
+          )}
         </div>
 
         {/* Modal Footer with Toast and Actions */}
@@ -744,9 +784,14 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{toastMessage}</span>
             </div>
-          ) : (
+          ) : isReviewVisible ? (
             <div className="text-xs text-slate-500 hidden sm:block">
               Perubahan langsung mengupdate saldo & analitik keuangan keluarga.
+            </div>
+          ) : (
+            <div className="text-xs text-slate-400 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+              <span>Kirim pesan chat, rekam suara, atau unggah struk untuk tinjau transaksi</span>
             </div>
           )}
 
@@ -758,14 +803,16 @@ export const QuickInputModal: React.FC<QuickInputModalProps> = ({
             >
               Batal
             </button>
-            <button
-              type="submit"
-              form="quick-tx-form"
-              className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
-            >
-              <Check className="w-4 h-4 text-mint-brand" />
-              <span>Simpan Transaksi</span>
-            </button>
+            {isReviewVisible && (
+              <button
+                type="submit"
+                form="quick-tx-form"
+                className="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition flex items-center justify-center gap-2 cursor-pointer shadow-md animate-in fade-in"
+              >
+                <Check className="w-4 h-4 text-teal-400" />
+                <span>Simpan Transaksi</span>
+              </button>
+            )}
           </div>
         </div>
       </div>

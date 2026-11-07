@@ -34,15 +34,26 @@ const HOST = getHost();
 app.use(express.json({ limit: '30mb' }));
 app.use(express.urlencoded({ extended: true, limit: '30mb' }));
 
-// Initialize Google Gemini Client (server-side only)
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || '',
-  httpOptions: {
-    headers: {
-      'User-Agent': 'aistudio-build',
-    },
-  },
-});
+// Initialize Google Gemini Client on-demand (server-side only)
+function getAiClient(): GoogleGenAI | null {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey || apiKey === 'MY_GEMINI_API_KEY' || !apiKey.trim()) {
+    return null;
+  }
+  try {
+    return new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+  } catch (err) {
+    console.warn('Notice: Failed to initialize GoogleGenAI client:', err);
+    return null;
+  }
+}
 
 // Heuristic fallback for text transaction parsing in Indonesian
 function fallbackParseTransaction(text: string, knownAccounts: string[] = [], knownCategories: string[] = []) {
@@ -134,7 +145,8 @@ const handleParseTransaction = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'Teks transaksi diperlukan' });
   }
 
-  if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MY_GEMINI_API_KEY') {
+  const ai = getAiClient();
+  if (!ai) {
     const fallback = fallbackParseTransaction(text, accounts, categories);
     return res.json({ transaction: fallback, source: 'fallback' });
   }
@@ -205,7 +217,8 @@ app.post('/api/ai/parse-receipt', async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Data gambar struk diperlukan (base64)' });
     }
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MY_GEMINI_API_KEY') {
+    const ai = getAiClient();
+    if (!ai) {
       // Fallback demo receipt result
       return res.json({
         receipt: {
@@ -322,7 +335,8 @@ Tugas Anda:
 4. Selalu memotivasi dan merayakan pencapaian tabungan / pelunasan utang keluarga.
 5. Menjaga fokus pada ketahanan finansial keluarga, dana darurat, dan cashflow sehat.`;
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MY_GEMINI_API_KEY') {
+    const ai = getAiClient();
+    if (!ai) {
       return res.json({
         reply: `Halo, Ayah & Ibu! 👋 Saya **searta AI** (*AI Family Finance*).
 
@@ -413,7 +427,8 @@ app.post('/api/ai/financial-advice', async (req: Request, res: Response) => {
   "emergencyFundStatus": "string analisis kecukupan dana darurat"
 }`;
 
-    if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MY_GEMINI_API_KEY') {
+    const ai = getAiClient();
+    if (!ai) {
       return res.json({
         analysis: fallbackAnalysis,
         source: 'fallback',
